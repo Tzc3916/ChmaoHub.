@@ -87,7 +87,7 @@ local function addListButton(name)
 end
 
 -- 添加三个示例功能按钮
-addListButton("主页")
+addListButton("更新云")
 addListButton("脚本1")
 addListButton("脚本2")
 
