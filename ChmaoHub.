@@ -1,4 +1,3 @@
--- Roblox 移动端脚本中心 UI 模板（改进版）
 local player = game.Players.LocalPlayer
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "MobileScriptHubUI"
@@ -9,7 +8,7 @@ openBtn.Name = "OpenButton"
 openBtn.Size = UDim2.new(0, 60, 0, 60)
 openBtn.Position = UDim2.new(0.8, 0, 0.7, 0)
 openBtn.BackgroundTransparency = 1
-openBtn.Image = "rbxassetid://3570695787" -- 圆形
+openBtn.Image = "rbxassetid://3570695787"
 openBtn.ImageColor3 = Color3.fromRGB(80, 180, 255)
 openBtn.ImageTransparency = 0.3
 
@@ -50,7 +49,6 @@ mainFrame.BackgroundTransparency = 0.45
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 
--- 圆角
 local UICorner = Instance.new("UICorner", mainFrame)
 UICorner.CornerRadius = UDim.new(0, 20)
 
@@ -65,13 +63,150 @@ listFrame.BorderSizePixel = 0
 local listCorner = Instance.new("UICorner", listFrame)
 listCorner.CornerRadius = UDim.new(0, 18)
 
--- 选择列表布局
 local UIListLayout = Instance.new("UIListLayout", listFrame)
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Padding = UDim.new(0, 12)
 
--- 示例：添加选择按钮（功能按钮、你可自行扩展）
-local function addListButton(name)
+-- 右侧主内容显示区域
+local contentFrame = Instance.new("Frame", mainFrame)
+contentFrame.Name = "ContentFrame"
+contentFrame.Position = UDim2.new(0, 76, 0, 16)
+contentFrame.Size = UDim2.new(1, -86, 1, -32)
+contentFrame.BackgroundTransparency = 1
+
+-- 主页文本
+local contentLabel = Instance.new("TextLabel", contentFrame)
+contentLabel.Name = "ContentLabel"
+contentLabel.Position = UDim2.new(0, 0, 0, 0)
+contentLabel.Size = UDim2.new(1, 0, 1, 0)
+contentLabel.BackgroundTransparency = 1
+contentLabel.TextColor3 = Color3.fromRGB(40, 40, 100)
+contentLabel.Font = Enum.Font.Gotham
+contentLabel.TextSize = 18
+contentLabel.TextWrapped = true
+contentLabel.TextXAlignment = Enum.TextXAlignment.Left
+contentLabel.TextYAlignment = Enum.TextYAlignment.Top
+contentLabel.Visible = true
+contentLabel.Text = ""
+
+-- 功能按钮容器（用于脚本1、脚本2）
+local function clearContentFrame()
+    for _, v in pairs(contentFrame:GetChildren()) do
+        if v ~= contentLabel then
+            v:Destroy()
+        end
+    end
+    contentLabel.Visible = false
+end
+
+local function showHome()
+    clearContentFrame()
+    contentLabel.Visible = true
+    contentLabel.Text = [[
+欢迎使用Chmao脚本中心！
+
+QQ群：123456789
+作者：Tzc3916
+介绍：这是一个支持云更新与多功能脚本的移动端脚本中心。
+
+功能：
+1. 点击左侧“脚本1”“脚本2”可体验丰富功能
+2. 点击对应功能名称即可一键执行
+
+如有建议或问题请联系作者。
+]]
+end
+
+-- 速度调节功能相关变量和方法（请自行根据你的游戏逻辑完善）
+local speed = 1
+local tpEnabled = false
+function startTPWalk()
+    print("开始TP行走, 速度：" .. tostring(speed))
+    -- 你的TP行走逻辑
+end
+function stopTPWalk()
+    print("停止TP行走")
+    -- 你的停止逻辑
+end
+
+local function showScriptList(scriptType)
+    clearContentFrame()
+    if scriptType == "Script1" then
+        -- 第1个按钮: 速度调节
+        local funBtn = Instance.new("TextButton", contentFrame)
+        funBtn.Name = scriptType .. "_FuncBtn1"
+        funBtn.Size = UDim2.new(1, 0, 0, 34)
+        funBtn.Position = UDim2.new(0, 0, 0, 0)
+        funBtn.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
+        funBtn.BackgroundTransparency = 0.15
+        funBtn.Text = "速度调节"
+        funBtn.TextColor3 = Color3.fromRGB(40, 40, 100)
+        funBtn.Font = Enum.Font.Gotham
+        funBtn.TextSize = 16
+        funBtn.AutoButtonColor = true
+        funBtn.TextXAlignment = Enum.TextXAlignment.Left
+        local btnCorner = Instance.new("UICorner", funBtn)
+        btnCorner.CornerRadius = UDim.new(0, 10)
+        funBtn.MouseButton1Click:Connect(function()
+            -- 速度调节UI
+            player:Slider('加速设置', 'SpeedSlider', 1, 1, 15, false, function(value)
+                speed = value
+            end)
+            player:Toggle("速度开关", "speed", false, function(value)
+                tpEnabled = value
+                if value then
+                    startTPWalk()
+                else
+                    stopTPWalk()
+                end
+            end)
+        end)
+        -- 其余9个功能按钮占位
+        for i = 2, 10 do
+            local funBtn = Instance.new("TextButton", contentFrame)
+            funBtn.Name = scriptType .. "_FuncBtn" .. i
+            funBtn.Size = UDim2.new(1, 0, 0, 34)
+            funBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 38)
+            funBtn.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
+            funBtn.BackgroundTransparency = 0.15
+            funBtn.Text = "（这里添加功能脚本）"
+            funBtn.TextColor3 = Color3.fromRGB(40, 40, 100)
+            funBtn.Font = Enum.Font.Gotham
+            funBtn.TextSize = 16
+            funBtn.AutoButtonColor = true
+            funBtn.TextXAlignment = Enum.TextXAlignment.Left
+            local btnCorner = Instance.new("UICorner", funBtn)
+            btnCorner.CornerRadius = UDim.new(0, 10)
+            funBtn.MouseButton1Click:Connect(function()
+                print("执行功能脚本：" .. funBtn.Text)
+            end)
+        end
+    else
+        -- 脚本2：10个占位功能按钮
+        for i = 1, 10 do
+            local funBtn = Instance.new("TextButton", contentFrame)
+            funBtn.Name = scriptType .. "_FuncBtn" .. i
+            funBtn.Size = UDim2.new(1, 0, 0, 34)
+            funBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 38)
+            funBtn.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
+            funBtn.BackgroundTransparency = 0.15
+            funBtn.Text = "（这里添加功能脚本）"
+            funBtn.TextColor3 = Color3.fromRGB(40, 40, 100)
+            funBtn.Font = Enum.Font.Gotham
+            funBtn.TextSize = 16
+            funBtn.AutoButtonColor = true
+            funBtn.TextXAlignment = Enum.TextXAlignment.Left
+            local btnCorner = Instance.new("UICorner", funBtn)
+            btnCorner.CornerRadius = UDim.new(0, 10)
+            funBtn.MouseButton1Click:Connect(function()
+                print("执行功能脚本：" .. funBtn.Text)
+            end)
+        end
+    end
+end
+
+-- 改造addListButton支持回调
+local function addListButton(name, callback)
     local btn = Instance.new("TextButton", listFrame)
     btn.Size = UDim2.new(1, -16, 0, 44)
     btn.Position = UDim2.new(0, 8, 0, 0)
@@ -84,14 +219,23 @@ local function addListButton(name)
     btn.AutoButtonColor = true
     local btnCorner = Instance.new("UICorner", btn)
     btnCorner.CornerRadius = UDim.new(1, 0)
+    if callback then
+        btn.MouseButton1Click:Connect(callback)
+    end
 end
 
--- 添加三个示例功能按钮
-addListButton("更新云")
-addListButton("脚本1")
-addListButton("脚本2")
+-- 添加功能按钮
+addListButton("主页", showHome)
+addListButton("脚本1", function()
+    showScriptList("Script1")
+end)
+addListButton("脚本2", function()
+    showScriptList("Script2")
+end)
 
--- 主按钮点击：弹出或关闭悬浮窗
+-- 默认显示主页
+showHome()
+
 openBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = not mainFrame.Visible
 end)
