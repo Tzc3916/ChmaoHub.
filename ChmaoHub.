@@ -1,0 +1,97 @@
+-- Roblox 移动端脚本中心 UI 模板（改进版）
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "MobileScriptHubUI"
+
+-- 圆形主按钮
+local openBtn = Instance.new("ImageButton", gui)
+openBtn.Name = "OpenButton"
+openBtn.Size = UDim2.new(0, 60, 0, 60)
+openBtn.Position = UDim2.new(0.8, 0, 0.7, 0)
+openBtn.BackgroundTransparency = 1
+openBtn.Image = "rbxassetid://3570695787" -- 圆形
+openBtn.ImageColor3 = Color3.fromRGB(80, 180, 255)
+openBtn.ImageTransparency = 0.3
+
+-- 拖动主按钮
+local dragging = false
+local dragInput, mousePos, btnPos
+
+openBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        mousePos = input.Position
+        btnPos = openBtn.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+openBtn.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
+        local delta = input.Position - mousePos
+        openBtn.Position = UDim2.new(
+            btnPos.X.Scale, btnPos.X.Offset + delta.X,
+            btnPos.Y.Scale, btnPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- 悬浮窗（初始隐藏）
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 320, 0, 380)
+mainFrame.Position = UDim2.new(0.5, -160, 0.4, -190)
+mainFrame.BackgroundColor3 = Color3.fromRGB(120, 200, 255)
+mainFrame.BackgroundTransparency = 0.45
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = false
+
+-- 圆角
+local UICorner = Instance.new("UICorner", mainFrame)
+UICorner.CornerRadius = UDim.new(0, 20)
+
+-- 左侧功能列表
+local listFrame = Instance.new("Frame", mainFrame)
+listFrame.Name = "ListFrame"
+listFrame.Size = UDim2.new(0, 70, 1, 0)
+listFrame.Position = UDim2.new(0, 0, 0, 0)
+listFrame.BackgroundColor3 = Color3.fromRGB(80, 180, 255)
+listFrame.BackgroundTransparency = 0.35
+listFrame.BorderSizePixel = 0
+local listCorner = Instance.new("UICorner", listFrame)
+listCorner.CornerRadius = UDim.new(0, 18)
+
+-- 选择列表布局
+local UIListLayout = Instance.new("UIListLayout", listFrame)
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 12)
+
+-- 示例：添加选择按钮（功能按钮、你可自行扩展）
+local function addListButton(name)
+    local btn = Instance.new("TextButton", listFrame)
+    btn.Size = UDim2.new(1, -16, 0, 44)
+    btn.Position = UDim2.new(0, 8, 0, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
+    btn.BackgroundTransparency = 0.2
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(40, 40, 100)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 18
+    btn.AutoButtonColor = true
+    local btnCorner = Instance.new("UICorner", btn)
+    btnCorner.CornerRadius = UDim.new(1, 0)
+end
+
+-- 添加三个示例功能按钮
+addListButton("主页")
+addListButton("脚本1")
+addListButton("脚本2")
+
+-- 主按钮点击：弹出或关闭悬浮窗
+openBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
+end)
