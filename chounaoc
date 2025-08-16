@@ -1,9 +1,8 @@
--- Chmao脚本中心UI（移动端优化版）
+-- Chmao脚本中心UI（拖动修复版）
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
-local TS = game:GetService("TweenService")
 
 -- 创建主UI
 local Main = Instance.new("ScreenGui")
@@ -11,10 +10,10 @@ Main.Name = "ChmaoScriptUI"
 Main.ResetOnSpawn = false
 Main.Parent = game.CoreGui
 
--- 主框架（尺寸调整为更适合移动端）
+-- 主框架（恢复原始尺寸500x300）
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 400, 0, 500) -- 调整为更适合手机的尺寸
-Frame.Position = UDim2.new(0.5, -200, 0.5, -250)
+Frame.Size = UDim2.new(0, 500, 0, 300)
+Frame.Position = UDim2.new(0.5, -250, 0.5, -150)
 Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
 Frame.BackgroundTransparency = 0.15
 Frame.BorderSizePixel = 0
@@ -24,18 +23,18 @@ Frame.Parent = Main
 
 -- 添加圆角
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 12) -- 更大的圆角更适合移动端
+UICorner.CornerRadius = UDim.new(0, 8)
 UICorner.Parent = Frame
 
--- 顶部栏（加高以适应手指触摸）
+-- 顶部栏
 local TopBar = Instance.new("Frame")
-TopBar.Size = UDim2.new(1, 0, 0, 48) -- 加高顶部栏
+TopBar.Size = UDim2.new(1, 0, 0, 32)
 TopBar.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
 TopBar.BorderSizePixel = 0
 TopBar.Parent = Frame
 
 local TopBarCorner = Instance.new("UICorner")
-TopBarCorner.CornerRadius = UDim.new(0, 12)
+TopBarCorner.CornerRadius = UDim.new(0, 8)
 TopBarCorner.Parent = TopBar
 
 -- 标题文字
@@ -44,7 +43,7 @@ Title.Size = UDim2.new(0, 200, 1, 0)
 Title.Position = UDim2.new(0.5, -100, 0, 0)
 Title.Text = "CHMAO SCRIPT"
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 20 -- 稍大的字体
+Title.TextSize = 18
 Title.TextColor3 = Color3.fromRGB(200, 200, 255)
 Title.BackgroundTransparency = 1
 Title.Parent = TopBar
@@ -61,38 +60,40 @@ coroutine.wrap(function()
     end
 end)()
 
--- 左侧导航栏（加宽以适应手指触摸）
+-- 左侧导航栏
 local Sidebar = Instance.new("Frame")
-Sidebar.Size = UDim2.new(0, 120, 1, -48) -- 加宽侧边栏
-Sidebar.Position = UDim2.new(0, 0, 0, 48)
+Sidebar.Size = UDim2.new(0, 100, 1, -32)
+Sidebar.Position = UDim2.new(0, 0, 0, 32)
 Sidebar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 Sidebar.BackgroundTransparency = 0.2
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = Frame
 
--- 创建页签按钮（加大按钮尺寸）
+-- 创建页签按钮
 local TabBtns = {}
 local function createTab(name, order)
     local btn = Instance.new("TextButton")
     btn.Name = "Tab_"..name
-    btn.Size = UDim2.new(0.9, 0, 0, 50) -- 更高的按钮
-    btn.Position = UDim2.new(0.05, 0, 0, (order-1)*60 + 12) -- 更大的间距
+    btn.Size = UDim2.new(0.9, 0, 0, 36)
+    btn.Position = UDim2.new(0.05, 0, 0, (order-1)*42 + 8)
     btn.BackgroundColor3 = Color3.fromRGB(65, 65, 85)
     btn.TextColor3 = Color3.fromRGB(220, 220, 255)
     btn.Font = Enum.Font.GothamMedium
     btn.Text = name
-    btn.TextSize = 16 -- 更大的字体
+    btn.TextSize = 14
     btn.AutoButtonColor = false
     btn.Parent = Sidebar
     
     local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.CornerRadius = UDim.new(0, 6)
     btnCorner.Parent = btn
     
-    -- 悬停效果改为触摸反馈
-    btn.TouchLongPress:Connect(function()
+    -- 悬停效果
+    btn.MouseEnter:Connect(function()
         btn.BackgroundColor3 = Color3.fromRGB(85, 85, 105)
-        task.wait(0.2)
+    end)
+    
+    btn.MouseLeave:Connect(function()
         btn.BackgroundColor3 = Color3.fromRGB(65, 65, 85)
     end)
     
@@ -108,8 +109,8 @@ local func3Tab = createTab("功能3", 4)
 
 -- 主内容区域
 local ContentFrame = Instance.new("Frame")
-ContentFrame.Size = UDim2.new(1, -120, 1, -48)
-ContentFrame.Position = UDim2.new(0, 120, 0, 48)
+ContentFrame.Size = UDim2.new(1, -100, 1, -32)
+ContentFrame.Position = UDim2.new(0, 100, 0, 32)
 ContentFrame.BackgroundTransparency = 1
 ContentFrame.Parent = Frame
 
@@ -122,7 +123,7 @@ InfoPage.Parent = ContentFrame
 
 -- 欢迎信息
 local Welcome = Instance.new("TextLabel")
-Welcome.Size = UDim2.new(1, -20, 0, 50) -- 更大的高度
+Welcome.Size = UDim2.new(1, -20, 0, 40)
 Welcome.Position = UDim2.new(0, 10, 0, 10)
 Welcome.Text = "欢迎使用臭猫脚本"
 Welcome.TextColor3 = Color3.fromRGB(200, 200, 255)
@@ -133,11 +134,11 @@ Welcome.Parent = InfoPage
 
 -- 实时时间
 local TimeLabel = Instance.new("TextLabel")
-TimeLabel.Size = UDim2.new(1, -20, 0, 40) -- 更大的高度
-TimeLabel.Position = UDim2.new(0, 10, 0, 70) -- 调整位置
+TimeLabel.Size = UDim2.new(1, -20, 0, 30)
+TimeLabel.Position = UDim2.new(0, 10, 0, 50)
 TimeLabel.Text = os.date("%Y-%m-%d %H:%M:%S")
 TimeLabel.TextColor3 = Color3.fromRGB(180, 180, 220)
-TimeLabel.TextSize = 18 -- 更大的字体
+TimeLabel.TextSize = 16
 TimeLabel.Font = Enum.Font.Gotham
 TimeLabel.BackgroundTransparency = 1
 TimeLabel.Parent = InfoPage
@@ -150,11 +151,11 @@ end)()
 
 -- 联系信息
 local ContactLabel = Instance.new("TextLabel")
-ContactLabel.Size = UDim2.new(1, -20, 0, 120) -- 更大的高度
-ContactLabel.Position = UDim2.new(0, 10, 0, 120) -- 调整位置
+ContactLabel.Size = UDim2.new(1, -20, 0, 80)
+ContactLabel.Position = UDim2.new(0, 10, 0, 90)
 ContactLabel.Text = "QQ群: 962873051\n作者: 2563684259\n更新时间: 2025年8月16日"
 ContactLabel.TextColor3 = Color3.fromRGB(170, 170, 200)
-ContactLabel.TextSize = 16 -- 更大的字体
+ContactLabel.TextSize = 14
 ContactLabel.Font = Enum.Font.Gotham
 ContactLabel.TextYAlignment = Enum.TextYAlignment.Top
 ContactLabel.BackgroundTransparency = 1
@@ -164,43 +165,45 @@ ContactLabel.Parent = InfoPage
 local FeaturePage1 = Instance.new("ScrollingFrame")
 FeaturePage1.Size = UDim2.new(1, 0, 1, 0)
 FeaturePage1.BackgroundTransparency = 1
-FeaturePage1.ScrollBarThickness = 10 -- 更宽的滚动条
+FeaturePage1.ScrollBarThickness = 6
 FeaturePage1.Visible = false
 FeaturePage1.Parent = ContentFrame
 
--- 功能按钮生成器（加大按钮尺寸）
+-- 功能按钮生成器
 local function createFeatureButton(text, yPos)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 60) -- 更高的按钮
+    btn.Size = UDim2.new(0.9, 0, 0, 40)
     btn.Position = UDim2.new(0.05, 0, 0, yPos)
     btn.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
     btn.TextColor3 = Color3.fromRGB(240, 240, 255)
     btn.Font = Enum.Font.GothamMedium
     btn.Text = text
-    btn.TextSize = 18 -- 更大的字体
+    btn.TextSize = 16
     btn.AutoButtonColor = false
     btn.Parent = FeaturePage1
     
     local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.CornerRadius = UDim.new(0, 6)
     btnCorner.Parent = btn
     
-    -- 悬停效果改为触摸反馈
-    btn.TouchLongPress:Connect(function()
+    -- 悬停效果
+    btn.MouseEnter:Connect(function()
         btn.BackgroundColor3 = Color3.fromRGB(90, 90, 130)
-        task.wait(0.2)
+    end)
+    
+    btn.MouseLeave:Connect(function()
         btn.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
     end)
     
     return btn
 end
 
--- 创建功能按钮（调整间距）
-local speedBtn = createFeatureButton("人物速度加速", 20)
-local jumpBtn = createFeatureButton("超级跳跃", 90)
-local infJumpBtn = createFeatureButton("无限跳跃", 160)
-local noclipBtn = createFeatureButton("穿墙模式", 230)
-local flyBtn = createFeatureButton("飞行模式", 300)
+-- 创建功能按钮
+local speedBtn = createFeatureButton("人物速度加速", 15)
+local jumpBtn = createFeatureButton("超级跳跃", 65)
+local infJumpBtn = createFeatureButton("无限跳跃", 115)
+local noclipBtn = createFeatureButton("穿墙模式", 165)
+local flyBtn = createFeatureButton("飞行模式", 215)
 
 -- 功能实现（添加触摸支持）
 local function makeButtonAction(button, action)
@@ -290,24 +293,12 @@ makeButtonAction(flyBtn, function()
                         local cam = workspace.CurrentCamera.CFrame
                         local move = Vector3.new()
                         
-                        if UIS:IsKeyDown(Enum.KeyCode.W) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.DPadUp) then 
-                            move = move + cam.LookVector 
-                        end
-                        if UIS:IsKeyDown(Enum.KeyCode.S) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.DPadDown) then 
-                            move = move - cam.LookVector 
-                        end
-                        if UIS:IsKeyDown(Enum.KeyCode.A) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.DPadLeft) then 
-                            move = move - cam.RightVector 
-                        end
-                        if UIS:IsKeyDown(Enum.KeyCode.D) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.DPadRight) then 
-                            move = move + cam.RightVector 
-                        end
-                        if UIS:IsKeyDown(Enum.KeyCode.Space) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonA) then 
-                            move = move + Vector3.new(0, 1, 0) 
-                        end
-                        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonB) then 
-                            move = move + Vector3.new(0, -1, 0) 
-                        end
+                        if UIS:IsKeyDown(Enum.KeyCode.W) then move = move + cam.LookVector end
+                        if UIS:IsKeyDown(Enum.KeyCode.S) then move = move - cam.LookVector end
+                        if UIS:IsKeyDown(Enum.KeyCode.A) then move = move - cam.RightVector end
+                        if UIS:IsKeyDown(Enum.KeyCode.D) then move = move + cam.RightVector end
+                        if UIS:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
+                        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then move = move + Vector3.new(0, -1, 0) end
                         
                         if move.Magnitude > 0 then
                             bv.Velocity = move.Unit * 50
@@ -359,21 +350,21 @@ end
 -- ===== 可拖动的迷你开关按钮 =====
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Name = "ToggleButton"
-ToggleBtn.Size = UDim2.new(0, 120, 0, 50) -- 更大的按钮
+ToggleBtn.Size = UDim2.new(0, 100, 0, 36)
 ToggleBtn.Position = UDim2.new(0, 20, 0, 20)
 ToggleBtn.Text = "打开脚本"
 ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.TextSize = 18 -- 更大的字体
+ToggleBtn.TextSize = 14
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 100, 180)
 ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
 ToggleBtn.Parent = Main
 
 -- 添加圆角
 local ToggleCorner = Instance.new("UICorner")
-ToggleCorner.CornerRadius = UDim.new(0, 12)
+ToggleCorner.CornerRadius = UDim.new(0, 8)
 ToggleCorner.Parent = ToggleBtn
 
--- 拖动功能（移动端优化版）
+-- 拖动功能（修复版，支持移动端）
 local btnDragging, btnDragStart, btnStartPos
 
 local function handleDrag(input)
@@ -401,7 +392,7 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- 主窗口拖动功能（移动端优化）
+-- 主窗口拖动功能（修复版，支持移动端）
 local frameDragging, frameDragStart, frameStartPos
 
 TopBar.InputBegan:Connect(function(input)
@@ -427,25 +418,15 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- 切换显示/隐藏（添加动画效果）
+-- 切换显示/隐藏
 ToggleBtn.MouseButton1Click:Connect(function()
     Frame.Visible = not Frame.Visible
     ToggleBtn.Text = Frame.Visible and "关闭脚本" or "打开脚本"
-    
-    -- 添加动画效果
-    if Frame.Visible then
-        Frame.Position = UDim2.new(0.5, -200, 0.5, -250)
-    end
 end)
 
 ToggleBtn.TouchTap:Connect(function()
     Frame.Visible = not Frame.Visible
     ToggleBtn.Text = Frame.Visible and "关闭脚本" or "打开脚本"
-    
-    -- 添加动画效果
-    if Frame.Visible then
-        Frame.Position = UDim2.new(0.5, -200, 0.5, -250)
-    end
 end)
 
 -- 初始显示信息页
