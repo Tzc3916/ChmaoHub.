@@ -1,4 +1,4 @@
--- Chmao脚本中心UI（100%测试通过版）
+-- Chmao脚本中心UI（全可拖动版）
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -9,50 +9,7 @@ local Main = Instance.new("ScreenGui")
 Main.Name = "ChmaoScriptUI"
 Main.ResetOnSpawn = false
 Main.Parent = game.CoreGui
--- 可拖动的迷你开关按钮（添加到Main下，不是Frame下）
-local ToggleBtn = Instance.new("TextButton")
-ToggleBtn.Name = "ToggleButton"
-ToggleBtn.Size = UDim2.new(0, 100, 0, 36)
-ToggleBtn.Position = UDim2.new(0, 20, 0, 20)
-ToggleBtn.Text = "打开脚本"
-ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.TextSize = 14
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 100, 180)
-ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
-ToggleBtn.Parent = Main  -- 注意这里是Main不是Frame
 
--- 添加圆角
-local ToggleCorner = Instance.new("UICorner")
-ToggleCorner.CornerRadius = UDim2.new(0, 8)
-ToggleCorner.Parent = ToggleBtn
-
--- 开关按钮的拖动功能
-local btnDragging, btnDragStart, btnStartPos
-ToggleBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        btnDragging = true
-        btnDragStart = input.Position
-        btnStartPos = ToggleBtn.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                btnDragging = false
-            end
-        end)
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if btnDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - btnDragStart
-        ToggleBtn.Position = btnStartPos + UDim2.new(0, delta.X, 0, delta.Y)
-    end
-end)
-
--- 切换显示/隐藏
-ToggleBtn.MouseButton1Click:Connect(function()
-    Frame.Visible = not Frame.Visible
-    ToggleBtn.Text = Frame.Visible and "关闭脚本" or "打开脚本"
-end)
 -- 主框架（尺寸缩小为500x300）
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 500, 0, 300)
@@ -61,7 +18,7 @@ Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
 Frame.BackgroundTransparency = 0.15
 Frame.BorderSizePixel = 0
 Frame.Active = true
-Frame.Draggable = true
+Frame.Draggable = false  -- 禁用默认拖动，使用自定义拖动
 Frame.Visible = false
 Frame.Parent = Main
 
@@ -70,7 +27,7 @@ local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 8)
 UICorner.Parent = Frame
 
--- 顶部栏
+-- 顶部栏（用于拖动主窗口）
 local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1, 0, 0, 32)
 TopBar.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
@@ -80,6 +37,29 @@ TopBar.Parent = Frame
 local TopBarCorner = Instance.new("UICorner")
 TopBarCorner.CornerRadius = UDim.new(0, 8)
 TopBarCorner.Parent = TopBar
+
+-- 主窗口拖动功能
+local frameDragging, frameDragStart, frameStartPos
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        frameDragging = true
+        frameDragStart = input.Position
+        frameStartPos = Frame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                frameDragging = false
+            end
+        end)
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if frameDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - frameDragStart
+        Frame.Position = frameStartPos + UDim2.new(0, delta.X, 0, delta.Y)
+    end
+end)
 
 -- 标题文字
 local Title = Instance.new("TextLabel")
@@ -403,16 +383,23 @@ local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0, 8)
 ToggleCorner.Parent = ToggleBtn
 
--- 拖动功能（流畅跟手）
+-- 开关按钮拖动功能（流畅跟手）
 local btnDragging, btnDragStart, btnStartPos
 ToggleBtn.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         btnDragging = true
         btnDragStart = input.Position
         btnStartPos = ToggleBtn.Position
+        
+        -- 拖动时改变外观
+        ToggleBtn.BackgroundTransparency = 0.2
+        ToggleBtn.Size = UDim2.new(0, 110, 0, 40)
+        
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 btnDragging = false
+                ToggleBtn.BackgroundTransparency = 0
+                ToggleBtn.Size = UDim2.new(0, 100, 0, 36)
             end
         end)
     end
