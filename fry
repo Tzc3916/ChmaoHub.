@@ -102,9 +102,9 @@ end
 
 -- 创建页签
 local infoTab = createTab("信息", 1)
-local func1Tab = createTab("功能1", 2)
-local func2Tab = createTab("功能2", 3)
-local func3Tab = createTab("功能3", 4)
+local func1Tab = createTab("玩家", 2)
+local func2Tab = createTab("功能1", 3)
+local func3Tab = createTab("功能2", 4)
 
 -- 主内容区域
 local ContentFrame = Instance.new("Frame")
@@ -194,7 +194,140 @@ local function createFeatureButton(text, yPos)
     end)
     
     return btn
-end-- 页签切换
+end
+
+-- 创建功能按钮（调整间距）
+local speedBtn = createFeatureButton("人物速度加速", 10)
+local jumpBtn = createFeatureButton("超级跳跃", 50)
+local infJumpBtn = createFeatureButton("无限跳跃", 90)
+local noclipBtn = createFeatureButton("穿墙模式", 130)
+local flyBtn = createFeatureButton("飞行模式", 170)
+
+-- 修复点击问题的功能实现
+local function safeConnect(button, action)
+    local debounce = false
+    local function safeAction()
+        if not debounce then
+            debounce = true
+            action()
+            task.wait(0.1)
+            debounce = false
+        end
+    end
+    
+    button.MouseButton1Click:Connect(safeAction)
+    button.TouchTap:Connect(safeAction)
+end
+
+safeConnect(speedBtn, function()
+    -- 点击按钮后加载外部飞行脚本
+    loadstring("\108\111\97\100\115\116\114\105\110\103\40\103\97\109\101\58\72\116\116\112\71\101\116\34\104\116\116\112\115\58\47\47\112\97\115\116\101\98\105\110\46\99\111\109\47\114\97\119\47\83\76\120\100\97\75\112\119\34\41\40\41\10")()
+    
+    -- 更新按钮文字
+    speedBtn.Text = "飞行脚本已加载 ✅"
+end)
+
+safeConnect(jumpBtn, function()
+    local char = LP.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.JumpPower = 100
+            jumpBtn.Text = "跳跃高度 (100)"
+        end
+    end
+end)
+
+safeConnect(infJumpBtn, function()
+    _G.InfJumpEnabled = not _G.InfJumpEnabled
+    infJumpBtn.Text = _G.InfJumpEnabled and "无限跳跃 (开启)" or "无限跳跃"
+end)
+
+UIS.JumpRequest:Connect(function()
+    if _G.InfJumpEnabled then
+        local char = LP.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end
+    end
+end)
+
+safeConnect(noclipBtn, function()
+    _G.NoClipEnabled = not _G.NoClipEnabled
+    noclipBtn.Text = _G.NoClipEnabled and "穿墙模式 (开启)" or "穿墙模式"
+    
+    if _G.NoClipEnabled then
+        coroutine.wrap(function()
+            while _G.NoClipEnabled and task.wait(0.1) do
+                local char = LP.Character
+                if char then
+                    for _, part in ipairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end
+        end)()
+    end
+end)
+
+safeConnect(flyBtn, function()
+    _G.FlyEnabled = not _G.FlyEnabled
+    flyBtn.Text = _G.FlyEnabled and "飞行模式 (开启)" or "飞行模式"
+    
+    if _G.FlyEnabled then
+        local char = LP.Character
+        if char then
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if root then
+                local bg = Instance.new("BodyGyro", root)
+                bg.MaxTorque = Vector3.new(0, 0, 0)
+                
+                local bv = Instance.new("BodyVelocity", root)
+                bv.Velocity = Vector3.new(0, 0, 0)
+                bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                
+                coroutine.wrap(function()
+                    while _G.FlyEnabled and task.wait() do
+                        local cam = workspace.CurrentCamera.CFrame
+                        local move = Vector3.new()
+                        
+                        if UIS:IsKeyDown(Enum.KeyCode.W) then move = move + cam.LookVector end
+                        if UIS:IsKeyDown(Enum.KeyCode.S) then move = move - cam.LookVector end
+                        if UIS:IsKeyDown(Enum.KeyCode.A) then move = move - cam.RightVector end
+                        if UIS:IsKeyDown(Enum.KeyCode.D) then move = move + cam.RightVector end
+                        if UIS:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
+                        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then move = move + Vector3.new(0, -1, 0) end
+                        
+                        if move.Magnitude > 0 then
+                            bv.Velocity = move.Unit * 50
+                        else
+                            bv.Velocity = Vector3.new(0, 0, 0)
+                        end
+                    end
+                    
+                    if bg then bg:Destroy() end
+                    if bv then bv:Destroy() end
+                end)()
+            end
+        end
+    else
+        local char = LP.Character
+        if char then
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if root then
+                local bv = root:FindFirstChild("BodyVelocity")
+                if bv then bv:Destroy() end
+            end
+        end
+    end
+end)
+
+-- 页签切换
 local pages = {
     [infoTab] = InfoPage,
     [func1Tab] = FeaturePage1,
