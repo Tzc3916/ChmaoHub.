@@ -1,8 +1,13 @@
--- Chmao脚本中心UI（最终修复版）
+-- Chmao脚本中心UI（可执行修复版）
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
+
+-- 全局状态变量
+_G.FlyEnabled = false
+_G.NoClipEnabled = false
+_G.InfJumpEnabled = false
 
 -- 创建主UI
 local Main = Instance.new("ScreenGui")
@@ -41,7 +46,7 @@ TopBarCorner.Parent = TopBar
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0, 200, 1, 0)
 Title.Position = UDim2.new(0.5, -100, 0, 0)
-Title.Text =     "CHUOMAO SCRIPT"
+Title.Text = "CHUOMAO SCRIPT"
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 18
 Title.TextColor3 = Color3.fromRGB(200, 200, 255)
@@ -69,18 +74,18 @@ Sidebar.BackgroundTransparency = 0.2
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = Frame
 
--- 创建页签按钮（缩小尺寸）
+-- 创建页签按钮
 local TabBtns = {}
 local function createTab(name, order)
     local btn = Instance.new("TextButton")
     btn.Name = "Tab_"..name
-    btn.Size = UDim2.new(0.9, 0, 0, 30) -- 缩小高度
-    btn.Position = UDim2.new(0.05, 0, 0, (order-1)*36 + 8) -- 调整间距
+    btn.Size = UDim2.new(0.9, 0, 0, 30)
+    btn.Position = UDim2.new(0.05, 0, 0, (order-1)*36 + 8)
     btn.BackgroundColor3 = Color3.fromRGB(65, 65, 85)
     btn.TextColor3 = Color3.fromRGB(220, 220, 255)
     btn.Font = Enum.Font.GothamMedium
     btn.Text = name
-    btn.TextSize = 12 -- 缩小字体
+    btn.TextSize = 12
     btn.AutoButtonColor = false
     btn.Parent = Sidebar
     
@@ -168,16 +173,16 @@ FeaturePage1.ScrollBarThickness = 6
 FeaturePage1.Visible = false
 FeaturePage1.Parent = ContentFrame
 
--- 功能按钮生成器（缩小尺寸）
+-- 功能按钮生成器
 local function createFeatureButton(text, yPos)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 32) -- 缩小高度
+    btn.Size = UDim2.new(0.9, 0, 0, 32)
     btn.Position = UDim2.new(0.05, 0, 0, yPos)
     btn.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
     btn.TextColor3 = Color3.fromRGB(240, 240, 255)
     btn.Font = Enum.Font.GothamMedium
     btn.Text = text
-    btn.TextSize = 14 -- 缩小字体
+    btn.TextSize = 14
     btn.AutoButtonColor = false
     btn.Parent = FeaturePage1
     
@@ -196,20 +201,20 @@ local function createFeatureButton(text, yPos)
     return btn
 end
 
--- 创建功能按钮（调整间距）
+-- 创建功能按钮
 local speedBtn = createFeatureButton("人物速度加速", 10)
 local jumpBtn = createFeatureButton("超级跳跃", 50)
 local infJumpBtn = createFeatureButton("无限跳跃", 90)
 local noclipBtn = createFeatureButton("穿墙模式", 130)
 local flyBtn = createFeatureButton("飞行模式", 170)
 
--- 修复点击问题的功能实现
+-- 安全连接函数
 local function safeConnect(button, action)
     local debounce = false
     local function safeAction()
         if not debounce then
             debounce = true
-            action()
+            pcall(action) -- 添加错误保护
             task.wait(0.1)
             debounce = false
         end
@@ -219,42 +224,37 @@ local function safeConnect(button, action)
     button.TouchTap:Connect(safeAction)
 end
 
+-- 速度加速
 safeConnect(speedBtn, function()
-    -- 点击按钮后加载外部飞行脚本
-    loadstring("\108\111\97\100\115\116\114\105\110\103\40\103\97\109\101\58\72\116\116\112\71\101\116\34\104\116\116\112\115\58\47\47\112\97\115\116\101\98\105\110\46\99\111\109\47\114\97\119\47\83\76\120\100\97\75\112\119\34\41\40\41\10")()
-    
-    -- 更新按钮文字
-    speedBtn.Text = "飞行脚本已加载 ✅"
-end)
-
-safeConnect(jumpBtn, function()
     local char = LP.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.JumpPower = 100
-            jumpBtn.Text = "跳跃高度 (100)"
-        end
+    if char and char:FindFirstChildOfClass("Humanoid") then
+        char.Humanoid.WalkSpeed = 50
+        speedBtn.Text = "速度加速 (50)"
     end
 end)
 
+-- 超级跳跃
+safeConnect(jumpBtn, function()
+    local char = LP.Character
+    if char and char:FindFirstChildOfClass("Humanoid") then
+        char.Humanoid.JumpPower = 100
+        jumpBtn.Text = "跳跃高度 (100)"
+    end
+end)
+
+-- 无限跳跃
 safeConnect(infJumpBtn, function()
     _G.InfJumpEnabled = not _G.InfJumpEnabled
     infJumpBtn.Text = _G.InfJumpEnabled and "无限跳跃 (开启)" or "无限跳跃"
 end)
 
 UIS.JumpRequest:Connect(function()
-    if _G.InfJumpEnabled then
-        local char = LP.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-        end
+    if _G.InfJumpEnabled and LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+        LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
 
+-- 穿墙模式
 safeConnect(noclipBtn, function()
     _G.NoClipEnabled = not _G.NoClipEnabled
     noclipBtn.Text = _G.NoClipEnabled and "穿墙模式 (开启)" or "穿墙模式"
@@ -262,68 +262,52 @@ safeConnect(noclipBtn, function()
     if _G.NoClipEnabled then
         coroutine.wrap(function()
             while _G.NoClipEnabled and task.wait(0.1) do
-                local char = LP.Character
-                if char then
-                    for _, part in ipairs(char:GetDescendants()) do
+                pcall(function()
+                    for _, part in ipairs(LP.Character:GetDescendants()) do
                         if part:IsA("BasePart") then
                             part.CanCollide = false
                         end
                     end
-                end
+                end)
             end
         end)()
     end
 end)
 
+-- 飞行模式（优化版）
 safeConnect(flyBtn, function()
     _G.FlyEnabled = not _G.FlyEnabled
     flyBtn.Text = _G.FlyEnabled and "飞行模式 (开启)" or "飞行模式"
     
     if _G.FlyEnabled then
-        local char = LP.Character
-        if char then
-            local root = char:FindFirstChild("HumanoidRootPart")
-            if root then
-                local bg = Instance.new("BodyGyro", root)
-                bg.MaxTorque = Vector3.new(0, 0, 0)
-                
-                local bv = Instance.new("BodyVelocity", root)
-                bv.Velocity = Vector3.new(0, 0, 0)
-                bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-                
-                coroutine.wrap(function()
-                    while _G.FlyEnabled and task.wait() do
-                        local cam = workspace.CurrentCamera.CFrame
-                        local move = Vector3.new()
-                        
-                        if UIS:IsKeyDown(Enum.KeyCode.W) then move = move + cam.LookVector end
-                        if UIS:IsKeyDown(Enum.KeyCode.S) then move = move - cam.LookVector end
-                        if UIS:IsKeyDown(Enum.KeyCode.A) then move = move - cam.RightVector end
-                        if UIS:IsKeyDown(Enum.KeyCode.D) then move = move + cam.RightVector end
-                        if UIS:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
-                        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then move = move + Vector3.new(0, -1, 0) end
-                        
-                        if move.Magnitude > 0 then
-                            bv.Velocity = move.Unit * 50
-                        else
-                            bv.Velocity = Vector3.new(0, 0, 0)
-                        end
-                    end
+        coroutine.wrap(function()
+            local char = LP.Character or LP.CharacterAdded:Wait()
+            local root = char:WaitForChild("HumanoidRootPart")
+            local bg = Instance.new("BodyGyro", root)
+            local bv = Instance.new("BodyVelocity", root)
+            
+            bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+            bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            
+            while _G.FlyEnabled and task.wait() do
+                pcall(function()
+                    local cam = workspace.CurrentCamera.CFrame
+                    local move = Vector3.new()
                     
-                    if bg then bg:Destroy() end
-                    if bv then bv:Destroy() end
-                end)()
+                    if UIS:IsKeyDown(Enum.KeyCode.W) then move = move + cam.LookVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.S) then move = move - cam.LookVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.A) then move = move - cam.RightVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.D) then move = move + cam.RightVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
+                    if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then move = move + Vector3.new(0, -1, 0) end
+                    
+                    bv.Velocity = move.Magnitude > 0 and move.Unit * 50 or Vector3.new(0, 0, 0)
+                end)
             end
-        end
-    else
-        local char = LP.Character
-        if char then
-            local root = char:FindFirstChild("HumanoidRootPart")
-            if root then
-                local bv = root:FindFirstChild("BodyVelocity")
-                if bv then bv:Destroy() end
-            end
-        end
+            
+            bg:Destroy()
+            bv:Destroy()
+        end)()
     end
 end)
 
@@ -346,14 +330,14 @@ for tab, btn in pairs(TabBtns) do
     end)
 end
 
--- ===== 可拖动的迷你开关按钮 =====
+-- 可拖动的迷你开关按钮
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Name = "ToggleButton"
-ToggleBtn.Size = UDim2.new(0, 80, 0, 30) -- 缩小尺寸
+ToggleBtn.Size = UDim2.new(0, 80, 0, 30)
 ToggleBtn.Position = UDim2.new(0, 20, 0, 20)
 ToggleBtn.Text = "打开脚本"
 ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.TextSize = 12 -- 缩小字体
+ToggleBtn.TextSize = 12
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 100, 180)
 ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
 ToggleBtn.Parent = Main
@@ -362,40 +346,14 @@ local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0, 8)
 ToggleCorner.Parent = ToggleBtn
 
--- 修复后的拖动逻辑（不影响点击）
+-- 拖动逻辑
 local btnDragging, btnDragStart, btnStartPos
-
-local function handleDrag(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        btnDragging = true
-        btnDragStart = input.Position
-        btnStartPos = ToggleBtn.Position
-        
-        local conn
-        conn = input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                btnDragging = false
-                if conn then conn:Disconnect() end
-            end
-        end)
-    end
-end
 
 ToggleBtn.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        -- 延迟一小段时间再判断是否是拖动
-        local startTime = tick()
-        local startPos = input.Position
-        
-        local dragCheck
-        dragCheck = game:GetService("RunService").Heartbeat:Connect(function()
-            if tick() - startTime > 0.1 then
-                dragCheck:Disconnect()
-                if (input.Position - startPos).Magnitude > 5 then
-                    handleDrag(input)
-                end
-            end
-        end)
+        btnDragging = true
+        btnDragStart = input.Position
+        btnStartPos = ToggleBtn.Position
     end
 end)
 
@@ -406,33 +364,20 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- 主窗口拖动逻辑（修复版）
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        btnDragging = false
+    end
+end)
+
+-- 主窗口拖动逻辑
 local frameDragging, frameDragStart, frameStartPos
 
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        local startTime = tick()
-        local startPos = input.Position
-        
-        local dragCheck
-        dragCheck = game:GetService("RunService").Heartbeat:Connect(function()
-            if tick() - startTime > 0.1 then
-                dragCheck:Disconnect()
-                if (input.Position - startPos).Magnitude > 5 then
-                    frameDragging = true
-                    frameDragStart = input.Position
-                    frameStartPos = Frame.Position
-                    
-                    local conn
-                    conn = input.Changed:Connect(function()
-                        if input.UserInputState == Enum.UserInputState.End then
-                            frameDragging = false
-                            if conn then conn:Disconnect() end
-                        end
-                    end)
-                end
-            end
-        end)
+        frameDragging = true
+        frameDragStart = input.Position
+        frameStartPos = Frame.Position
     end
 end)
 
@@ -443,13 +388,19 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- 切换显示/隐藏（使用安全连接）
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        frameDragging = false
+    end
+end)
+
+-- 切换显示/隐藏
 safeConnect(ToggleBtn, function()
     Frame.Visible = not Frame.Visible
     ToggleBtn.Text = Frame.Visible and "关闭脚本" or "打开脚本"
 end)
 
--- 初始显示信息页
+-- 初始状态
 InfoPage.Visible = true
 FeaturePage1.Visible = false
 
