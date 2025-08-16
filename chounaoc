@@ -1,0 +1,219 @@
+-- Chmao脚本中心UI（现代暗色主题版）
+local UIS = game:GetService("UserInputService")
+local RS = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local LP = game.Players.LocalPlayer
+
+-- 主UI（初始隐藏）
+local Main = Instance.new("ScreenGui")
+Main.Name = "ChmaoScriptUI"
+Main.ResetOnSpawn = false
+Main.Parent = game.CoreGui
+
+-- 暗色主框（带圆角）
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 450, 0, 320)
+Frame.Position = UDim2.new(0.5, -225, 0.5, -160)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+Frame.BackgroundTransparency = 0.15
+Frame.BorderSizePixel = 0
+Frame.Visible = false
+Frame.Parent = Main
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = Frame
+
+-- 顶部栏（带发光效果）
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 32)
+TopBar.Position = UDim2.new(0, 0, 0, 0)
+TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+TopBar.BorderSizePixel = 0
+TopBar.Parent = Frame
+
+local TopBarCorner = Instance.new("UICorner")
+TopBarCorner.CornerRadius = UDim.new(0, 8)
+TopBarCorner.Parent = TopBar
+
+-- 动态标题（霓虹效果）
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0, 200, 1, 0)
+Title.Position = UDim2.new(0.5, -100, 0, 0)
+Title.Text = "CHMAO SCRIPT"
+Title.Font = Enum.Font.GothamBold
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
+Title.BackgroundTransparency = 1
+Title.Parent = TopBar
+
+-- 左侧导航栏（渐变背景）
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 90, 1, -32)
+Sidebar.Position = UDim2.new(0, 0, 0, 32)
+Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+Sidebar.BackgroundTransparency = 0.2
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = Frame
+
+-- 页签按钮（带悬停动画）
+local function createTabButton(name, order)
+    local btn = Instance.new("TextButton")
+    btn.Name = "Tab_"..name
+    btn.Size = UDim2.new(0.9, 0, 0, 36)
+    btn.Position = UDim2.new(0.05, 0, 0, (order-1)*42 + 10)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+    btn.TextColor3 = Color3.fromRGB(220, 220, 220)
+    btn.Font = Enum.Font.GothamMedium
+    btn.Text = name
+    btn.TextSize = 14
+    btn.AutoButtonColor = false
+    btn.Parent = Sidebar
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = btn
+    
+    -- 悬停效果
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+        }):Play()
+    end)
+    
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        }):Play()
+    end)
+    
+    return btn
+end
+
+-- 创建页签
+local tabs = {
+    createTabButton("信息", 1),
+    createTabButton("功能1", 2),
+    createTabButton("功能2", 3),
+    createTabButton("设置", 4)
+}
+
+-- 主内容区域
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Size = UDim2.new(1, -90, 1, -32)
+ContentFrame.Position = UDim2.new(0, 90, 0, 32)
+ContentFrame.BackgroundTransparency = 1
+ContentFrame.Parent = Frame
+
+-- 信息页（简约设计）
+local InfoPage = Instance.new("Frame")
+InfoPage.Size = UDim2.new(1, 0, 1, 0)
+InfoPage.BackgroundTransparency = 1
+InfoPage.Visible = true
+InfoPage.Parent = ContentFrame
+
+local InfoText = Instance.new("TextLabel")
+InfoText.Size = UDim2.new(1, -20, 1, -20)
+InfoText.Position = UDim2.new(0, 10, 0, 10)
+InfoText.Text = "欢迎使用臭猫脚本\n\n版本: v1.0\n作者: 2563684259\n更新时间: 8月"
+InfoText.TextColor3 = Color3.fromRGB(200, 200, 200)
+InfoText.TextSize = 14
+InfoText.Font = Enum.Font.Gotham
+InfoText.TextXAlignment = Enum.TextXAlignment.Left
+InfoText.TextYAlignment = Enum.TextYAlignment.Top
+InfoText.BackgroundTransparency = 1
+InfoText.Parent = InfoPage
+
+-- 功能按钮生成器（带按压效果）
+local function createFeatureButton(parent, text, position)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9, 0, 0, 36)
+    btn.Position = position
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+    btn.TextColor3 = Color3.fromRGB(240, 240, 240)
+    btn.Font = Enum.Font.GothamMedium
+    btn.Text = text
+    btn.TextSize = 14
+    btn.AutoButtonColor = false
+    btn.Parent = parent
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = btn
+    
+    -- 动态效果
+    btn.MouseButton1Down:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.1), {
+            BackgroundColor3 = Color3.fromRGB(80, 80, 100)
+        }):Play()
+    end)
+    
+    btn.MouseButton1Up:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+        }):Play()
+    end)
+    
+    return btn
+end
+
+-- 功能页1
+local FeaturePage1 = Instance.new("ScrollingFrame")
+FeaturePage1.Size = UDim2.new(1, 0, 1, 0)
+FeaturePage1.BackgroundTransparency = 1
+FeaturePage1.ScrollBarThickness = 4
+FeaturePage1.Visible = false
+FeaturePage1.Parent = ContentFrame
+
+-- 创建功能按钮（示例）
+createFeatureButton(FeaturePage1, "人物速度加速", UDim2.new(0.05, 0, 0, 15))
+createFeatureButton(FeaturePage1, "超级跳跃", UDim2.new(0.05, 0, 0, 60))
+createFeatureButton(FeaturePage1, "无限跳跃", UDim2.new(0.05, 0, 0, 105))
+createFeatureButton(FeaturePage1, "穿墙模式", UDim2.new(0.05, 0, 0, 150))
+createFeatureButton(FeaturePage1, "飞行模式", UDim2.new(0.05, 0, 0, 195))
+
+-- 控制按钮（右上角）
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 100, 0, 32)
+ToggleBtn.Position = UDim2.new(1, -110, 0, 10)
+ToggleBtn.Text = "打开面板"
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.TextSize = 14
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 200)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Parent = Main
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 6)
+btnCorner.Parent = ToggleBtn
+
+-- 切换UI显示
+ToggleBtn.MouseButton1Click:Connect(function()
+    Frame.Visible = not Frame.Visible
+    ToggleBtn.Text = Frame.Visible and "关闭面板" or "打开面板"
+end)
+
+-- 拖动功能
+local dragging, dragInput, dragStart, startPos
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        Frame.Position = startPos + UDim2.new(0, delta.X, 0, delta.Y)
+    end
+end)
+
+-- 初始显示信息页
+InfoPage.Visible = true
