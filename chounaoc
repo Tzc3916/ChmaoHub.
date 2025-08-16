@@ -9,7 +9,50 @@ local Main = Instance.new("ScreenGui")
 Main.Name = "ChmaoScriptUI"
 Main.ResetOnSpawn = false
 Main.Parent = game.CoreGui
+-- 可拖动的迷你开关按钮（添加到Main下，不是Frame下）
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Name = "ToggleButton"
+ToggleBtn.Size = UDim2.new(0, 100, 0, 36)
+ToggleBtn.Position = UDim2.new(0, 20, 0, 20)
+ToggleBtn.Text = "打开脚本"
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.TextSize = 14
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 100, 180)
+ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
+ToggleBtn.Parent = Main  -- 注意这里是Main不是Frame
 
+-- 添加圆角
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim2.new(0, 8)
+ToggleCorner.Parent = ToggleBtn
+
+-- 开关按钮的拖动功能
+local btnDragging, btnDragStart, btnStartPos
+ToggleBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        btnDragging = true
+        btnDragStart = input.Position
+        btnStartPos = ToggleBtn.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                btnDragging = false
+            end
+        end)
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if btnDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - btnDragStart
+        ToggleBtn.Position = btnStartPos + UDim2.new(0, delta.X, 0, delta.Y)
+    end
+end)
+
+-- 切换显示/隐藏
+ToggleBtn.MouseButton1Click:Connect(function()
+    Frame.Visible = not Frame.Visible
+    ToggleBtn.Text = Frame.Visible and "关闭脚本" or "打开脚本"
+end)
 -- 主框架（尺寸缩小为500x300）
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 500, 0, 300)
@@ -154,7 +197,7 @@ end)()
 local ContactLabel = Instance.new("TextLabel")
 ContactLabel.Size = UDim2.new(1, -20, 0, 80)
 ContactLabel.Position = UDim2.new(0, 10, 0, 90)
-ContactLabel.Text = "QQ群: 962873051\n作者: 2563684259\n更新: 2023年8月"
+ContactLabel.Text = "QQ群: 962873051\n作者: 2563684259\n更新时间: 2025年8月16日"
 ContactLabel.TextColor3 = Color3.fromRGB(170, 170, 200)
 ContactLabel.TextSize = 14
 ContactLabel.Font = Enum.Font.Gotham
