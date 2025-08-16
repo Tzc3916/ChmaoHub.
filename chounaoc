@@ -1,4 +1,4 @@
--- Chmao脚本中心UI（拖动修复版）
+-- Chmao脚本中心UI（最终修复版）
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -10,7 +10,7 @@ Main.Name = "ChmaoScriptUI"
 Main.ResetOnSpawn = false
 Main.Parent = game.CoreGui
 
--- 主框架（恢复原始尺寸500x300）
+-- 主框架
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 500, 0, 300)
 Frame.Position = UDim2.new(0.5, -250, 0.5, -150)
@@ -69,18 +69,18 @@ Sidebar.BackgroundTransparency = 0.2
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = Frame
 
--- 创建页签按钮
+-- 创建页签按钮（缩小尺寸）
 local TabBtns = {}
 local function createTab(name, order)
     local btn = Instance.new("TextButton")
     btn.Name = "Tab_"..name
-    btn.Size = UDim2.new(0.9, 0, 0, 36)
-    btn.Position = UDim2.new(0.05, 0, 0, (order-1)*42 + 8)
+    btn.Size = UDim2.new(0.9, 0, 0, 30) -- 缩小高度
+    btn.Position = UDim2.new(0.05, 0, 0, (order-1)*36 + 8) -- 调整间距
     btn.BackgroundColor3 = Color3.fromRGB(65, 65, 85)
     btn.TextColor3 = Color3.fromRGB(220, 220, 255)
     btn.Font = Enum.Font.GothamMedium
     btn.Text = name
-    btn.TextSize = 14
+    btn.TextSize = 12 -- 缩小字体
     btn.AutoButtonColor = false
     btn.Parent = Sidebar
     
@@ -88,7 +88,6 @@ local function createTab(name, order)
     btnCorner.CornerRadius = UDim.new(0, 6)
     btnCorner.Parent = btn
     
-    -- 悬停效果
     btn.MouseEnter:Connect(function()
         btn.BackgroundColor3 = Color3.fromRGB(85, 85, 105)
     end)
@@ -169,16 +168,16 @@ FeaturePage1.ScrollBarThickness = 6
 FeaturePage1.Visible = false
 FeaturePage1.Parent = ContentFrame
 
--- 功能按钮生成器
+-- 功能按钮生成器（缩小尺寸）
 local function createFeatureButton(text, yPos)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 40)
+    btn.Size = UDim2.new(0.9, 0, 0, 32) -- 缩小高度
     btn.Position = UDim2.new(0.05, 0, 0, yPos)
     btn.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
     btn.TextColor3 = Color3.fromRGB(240, 240, 255)
     btn.Font = Enum.Font.GothamMedium
     btn.Text = text
-    btn.TextSize = 16
+    btn.TextSize = 14 -- 缩小字体
     btn.AutoButtonColor = false
     btn.Parent = FeaturePage1
     
@@ -186,7 +185,6 @@ local function createFeatureButton(text, yPos)
     btnCorner.CornerRadius = UDim.new(0, 6)
     btnCorner.Parent = btn
     
-    -- 悬停效果
     btn.MouseEnter:Connect(function()
         btn.BackgroundColor3 = Color3.fromRGB(90, 90, 130)
     end)
@@ -198,20 +196,30 @@ local function createFeatureButton(text, yPos)
     return btn
 end
 
--- 创建功能按钮
-local speedBtn = createFeatureButton("人物速度加速", 15)
-local jumpBtn = createFeatureButton("超级跳跃", 65)
-local infJumpBtn = createFeatureButton("无限跳跃", 115)
-local noclipBtn = createFeatureButton("穿墙模式", 165)
-local flyBtn = createFeatureButton("飞行模式", 215)
+-- 创建功能按钮（调整间距）
+local speedBtn = createFeatureButton("人物速度加速", 10)
+local jumpBtn = createFeatureButton("超级跳跃", 50)
+local infJumpBtn = createFeatureButton("无限跳跃", 90)
+local noclipBtn = createFeatureButton("穿墙模式", 130)
+local flyBtn = createFeatureButton("飞行模式", 170)
 
--- 功能实现（添加触摸支持）
-local function makeButtonAction(button, action)
-    button.MouseButton1Click:Connect(action)
-    button.TouchTap:Connect(action)
+-- 修复点击问题的功能实现
+local function safeConnect(button, action)
+    local debounce = false
+    local function safeAction()
+        if not debounce then
+            debounce = true
+            action()
+            task.wait(0.1)
+            debounce = false
+        end
+    end
+    
+    button.MouseButton1Click:Connect(safeAction)
+    button.TouchTap:Connect(safeAction)
 end
 
-makeButtonAction(speedBtn, function()
+safeConnect(speedBtn, function()
     local char = LP.Character
     if char then
         local hum = char:FindFirstChildOfClass("Humanoid")
@@ -222,7 +230,7 @@ makeButtonAction(speedBtn, function()
     end
 end)
 
-makeButtonAction(jumpBtn, function()
+safeConnect(jumpBtn, function()
     local char = LP.Character
     if char then
         local hum = char:FindFirstChildOfClass("Humanoid")
@@ -233,7 +241,7 @@ makeButtonAction(jumpBtn, function()
     end
 end)
 
-makeButtonAction(infJumpBtn, function()
+safeConnect(infJumpBtn, function()
     _G.InfJumpEnabled = not _G.InfJumpEnabled
     infJumpBtn.Text = _G.InfJumpEnabled and "无限跳跃 (开启)" or "无限跳跃"
 end)
@@ -250,7 +258,7 @@ UIS.JumpRequest:Connect(function()
     end
 end)
 
-makeButtonAction(noclipBtn, function()
+safeConnect(noclipBtn, function()
     _G.NoClipEnabled = not _G.NoClipEnabled
     noclipBtn.Text = _G.NoClipEnabled and "穿墙模式 (开启)" or "穿墙模式"
     
@@ -270,7 +278,7 @@ makeButtonAction(noclipBtn, function()
     end
 end)
 
-makeButtonAction(flyBtn, function()
+safeConnect(flyBtn, function()
     _G.FlyEnabled = not _G.FlyEnabled
     flyBtn.Text = _G.FlyEnabled and "飞行模式 (开启)" or "飞行模式"
     
@@ -279,7 +287,6 @@ makeButtonAction(flyBtn, function()
         if char then
             local root = char:FindFirstChild("HumanoidRootPart")
             if root then
-                -- 创建飞行控制器
                 local bg = Instance.new("BodyGyro", root)
                 bg.MaxTorque = Vector3.new(0, 0, 0)
                 
@@ -287,7 +294,6 @@ makeButtonAction(flyBtn, function()
                 bv.Velocity = Vector3.new(0, 0, 0)
                 bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
                 
-                -- 飞行控制循环
                 coroutine.wrap(function()
                     while _G.FlyEnabled and task.wait() do
                         local cam = workspace.CurrentCamera.CFrame
@@ -307,14 +313,12 @@ makeButtonAction(flyBtn, function()
                         end
                     end
                     
-                    -- 清理
                     if bg then bg:Destroy() end
                     if bv then bv:Destroy() end
                 end)()
             end
         end
     else
-        -- 飞行关闭时重置速度
         local char = LP.Character
         if char then
             local root = char:FindFirstChild("HumanoidRootPart")
@@ -335,12 +339,10 @@ local pages = {
 }
 
 for tab, btn in pairs(TabBtns) do
-    makeButtonAction(btn, function()
-        -- 隐藏所有页面
+    safeConnect(btn, function()
         InfoPage.Visible = false
         FeaturePage1.Visible = false
         
-        -- 显示当前页面
         if pages[btn] then
             pages[btn].Visible = true
         end
@@ -350,21 +352,20 @@ end
 -- ===== 可拖动的迷你开关按钮 =====
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Name = "ToggleButton"
-ToggleBtn.Size = UDim2.new(0, 100, 0, 36)
+ToggleBtn.Size = UDim2.new(0, 80, 0, 30) -- 缩小尺寸
 ToggleBtn.Position = UDim2.new(0, 20, 0, 20)
 ToggleBtn.Text = "打开脚本"
 ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.TextSize = 14
+ToggleBtn.TextSize = 12 -- 缩小字体
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 100, 180)
 ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
 ToggleBtn.Parent = Main
 
--- 添加圆角
 local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0, 8)
 ToggleCorner.Parent = ToggleBtn
 
--- 拖动功能（修复版，支持移动端）
+-- 修复后的拖动逻辑（不影响点击）
 local btnDragging, btnDragStart, btnStartPos
 
 local function handleDrag(input)
@@ -383,7 +384,23 @@ local function handleDrag(input)
     end
 end
 
-ToggleBtn.InputBegan:Connect(handleDrag)
+ToggleBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        -- 延迟一小段时间再判断是否是拖动
+        local startTime = tick()
+        local startPos = input.Position
+        
+        local dragCheck
+        dragCheck = game:GetService("RunService").Heartbeat:Connect(function()
+            if tick() - startTime > 0.1 then
+                dragCheck:Disconnect()
+                if (input.Position - startPos).Magnitude > 5 then
+                    handleDrag(input)
+                end
+            end
+        end)
+    end
+end)
 
 UIS.InputChanged:Connect(function(input)
     if btnDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
@@ -392,20 +409,31 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- 主窗口拖动功能（修复版，支持移动端）
+-- 主窗口拖动逻辑（修复版）
 local frameDragging, frameDragStart, frameStartPos
 
 TopBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        frameDragging = true
-        frameDragStart = input.Position
-        frameStartPos = Frame.Position
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        local startTime = tick()
+        local startPos = input.Position
         
-        local conn
-        conn = input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                frameDragging = false
-                if conn then conn:Disconnect() end
+        local dragCheck
+        dragCheck = game:GetService("RunService").Heartbeat:Connect(function()
+            if tick() - startTime > 0.1 then
+                dragCheck:Disconnect()
+                if (input.Position - startPos).Magnitude > 5 then
+                    frameDragging = true
+                    frameDragStart = input.Position
+                    frameStartPos = Frame.Position
+                    
+                    local conn
+                    conn = input.Changed:Connect(function()
+                        if input.UserInputState == Enum.UserInputState.End then
+                            frameDragging = false
+                            if conn then conn:Disconnect() end
+                        end
+                    end)
+                end
             end
         end)
     end
@@ -418,13 +446,8 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- 切换显示/隐藏
-ToggleBtn.MouseButton1Click:Connect(function()
-    Frame.Visible = not Frame.Visible
-    ToggleBtn.Text = Frame.Visible and "关闭脚本" or "打开脚本"
-end)
-
-ToggleBtn.TouchTap:Connect(function()
+-- 切换显示/隐藏（使用安全连接）
+safeConnect(ToggleBtn, function()
     Frame.Visible = not Frame.Visible
     ToggleBtn.Text = Frame.Visible and "关闭脚本" or "打开脚本"
 end)
