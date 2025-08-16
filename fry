@@ -1,101 +1,78 @@
--- Chmao脚本中心UI（最终修复版）
-local UIS = game:GetService("UserInputService")
-local RS = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LP = Players.LocalPlayer
-
--- 创建主UI
-local Main = Instance.new("ScreenGui")
-Main.Name = "ChmaoScriptUI"
-Main.ResetOnSpawn = false
-Main.Parent = game.CoreGui
-
--- 主框架
+-- Roblox Lua UI 1:1 复刻（Delta 注入器可用）
+local ScreenGui = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 500, 0, 300)
-Frame.Position = UDim2.new(0.5, -250, 0.5, -150)
-Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-Frame.BackgroundTransparency = 0.15
+local UIListLayout = Instance.new("UIListLayout")
+
+-- 基础UI设置
+ScreenGui.Parent = game:GetService("CoreGui") -- 注入到CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Name = "AimAssistUI" -- 可自定义名称
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- 白色背景
 Frame.BorderSizePixel = 0
-Frame.Active = true
-Frame.Visible = false
-Frame.Parent = Main
+Frame.Position = UDim2.new(0.5, -250, 0.5, -200) -- 居中
+Frame.Size = UDim2.new(0, 500, 0, 600) -- 宽500，高600（可调整）
 
--- 添加圆角
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 8)
-UICorner.Parent = Frame
+UIListLayout.Parent = Frame
+UIListLayout.Padding = UDim.new(0, 5) -- 项间距
 
--- 顶部栏
-local TopBar = Instance.new("Frame")
-TopBar.Size = UDim2.new(1, 0, 0, 32)
-TopBar.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-TopBar.BorderSizePixel = 0
-TopBar.Parent = Frame
-
-local TopBarCorner = Instance.new("UICorner")
-TopBarCorner.CornerRadius = UDim.new(0, 8)
-TopBarCorner.Parent = TopBar
-
--- 标题文字
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(0, 200, 1, 0)
-Title.Position = UDim2.new(0.5, -100, 0, 0)
-Title.Text =     "CHUOMAO SCRIPT"
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
-Title.TextColor3 = Color3.fromRGB(200, 200, 255)
-Title.BackgroundTransparency = 1
-Title.Parent = TopBar
-
--- 彩色渐变效果
-coroutine.wrap(function()
-    while task.wait(0.05) do
-        local t = tick() * 1.5
-        Title.TextColor3 = Color3.new(
-            0.7 + 0.3 * math.sin(t),
-            0.7 + 0.3 * math.sin(t + 2),
-            0.7 + 0.3 * math.sin(t + 4)
-        )
-    end
-end)()
-
--- 左侧导航栏
-local Sidebar = Instance.new("Frame")
-Sidebar.Size = UDim2.new(0, 100, 1, -32)
-Sidebar.Position = UDim2.new(0, 0, 0, 32)
-Sidebar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-Sidebar.BackgroundTransparency = 0.2
-Sidebar.BorderSizePixel = 0
-Sidebar.Parent = Frame
-
--- 创建页签按钮（缩小尺寸）
-local TabBtns = {}
-local function createTab(name, order)
-    local btn = Instance.new("TextButton")
-    btn.Name = "Tab_"..name
-    btn.Size = UDim2.new(0.9, 0, 0, 30) -- 缩小高度
-    btn.Position = UDim2.new(0.05, 0, 0, (order-1)*36 + 8) -- 调整间距
-    btn.BackgroundColor3 = Color3.fromRGB(65, 65, 85)
-    btn.TextColor3 = Color3.fromRGB(220, 220, 255)
-    btn.Font = Enum.Font.GothamMedium
-    btn.Text = name
-    btn.TextSize = 12 -- 缩小字体
-    btn.AutoButtonColor = false
-    btn.Parent = Sidebar
-    
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 6)
-    btnCorner.Parent = btn
-    
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(85, 85, 105)
-    end)
-    
-    btn.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(65, 65, 85)
-    end)
-    
-    TabBtns[name..order] = btn
-    return btn
+-- 创建文本函数
+local function CreateLabel(text, color, size, indent)
+    local label = Instance.new("TextLabel")
+    label.Parent = Frame
+    label.Text = text
+    label.TextColor3 = color
+    label.TextSize = size
+    label.Font = Enum.Font.SourceSans -- 默认字体
+    label.BackgroundTransparency = 1 -- 透明背景
+    label.TextXAlignment = Enum.TextXAlignment.Left -- 左对齐
+    label.Size = UDim2.new(1, -indent, 0, 30) -- 宽度自适应，缩进
+    label.PaddingLeft = UDim.new(0, indent) -- 缩进
+    return label
 end
+
+-- 创建分割线
+local function CreateDivider()
+    local divider = Instance.new("Frame")
+    divider.Parent = Frame
+    divider.BackgroundColor3 = Color3.fromRGB(230, 230, 230) -- 浅灰分割线
+    divider.BorderSizePixel = 0
+    divider.Size = UDim2.new(1, 0, 0, 1) -- 高度1px
+    return divider
+end
+
+-- 1. 红色警告文本
+CreateLabel("# 未获取到矩阵信息，重启手机或者重启辅助试试", Color3.fromRGB(255, 0, 0), 18, 0)
+
+-- 2. 已已托斯
+CreateLabel("## 已已托斯", Color3.fromRGB(0, 0, 0), 16, 0)
+CreateLabel("V: 3.9.0", Color3.fromRGB(0, 0, 0), 14, 15)
+
+-- 3. 驱动信息
+CreateLabel("## 驱动: Dome", Color3.fromRGB(0, 0, 0), 16, 0)
+CreateLabel("SDK版本: 29", Color3.fromRGB(0, 0, 0), 14, 15)
+
+-- 4. 主页声明
+CreateLabel("## 主页声明", Color3.fromRGB(0, 0, 0), 16, 0)
+CreateLabel("绘制图画", Color3.fromRGB(0, 0, 0), 14, 15)
+CreateLabel("触摸瞄准", Color3.fromRGB(0, 0, 0), 14, 15)
+CreateLabel("我的物资", Color3.fromRGB(0, 0, 0), 14, 15)
+CreateLabel("程序设置", Color3.fromRGB(0, 0, 0), 14, 15)
+
+-- 5. 主要的瞄准
+CreateLabel("## 主要的瞄准", Color3.fromRGB(0, 0, 0), 16, 0)
+CreateLabel("触摸瞄准", Color3.fromRGB(0, 0, 0), 14, 15)
+CreateLabel("触摸位置", Color3.fromRGB(0, 0, 0), 14, 15)
+CreateLabel("其他瞄准功能", Color3.fromRGB(0, 0, 0), 14, 15)
+CreateLabel("我的瞄准部位", Color3.fromRGB(0, 0, 0), 14, 15)
+CreateLabel("头颅", Color3.fromRGB(0, 0, 0), 14, 30) -- 子项缩进30
+CreateLabel("胸腔", Color3.fromRGB(0, 0, 0), 14, 30)
+CreateLabel("盆骨", Color3.fromRGB(0, 0, 0), 14, 30)
+CreateLabel("特殊的瞄准功能", Color3.fromRGB(0, 0, 0), 14, 15)
+CreateLabel("停火闪镜", Color3.fromRGB(0, 0, 0), 14, 30)
+CreateLabel("连点瞄准", Color3.fromRGB(0, 0, 0), 14, 30)
+
+-- 6. 最后的瞄准标题
+CreateLabel("## 瞄 准", Color3.fromRGB(0, 0, 0), 16, 0)
+CreateDivider() -- 分割线
