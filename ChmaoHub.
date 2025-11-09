@@ -1,241 +1,891 @@
-local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "MobileScriptHubUI"
+--by 神青 公开[已退网]
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+local Confirmed = false
 
--- 圆形主按钮
-local openBtn = Instance.new("ImageButton", gui)
-openBtn.Name = "OpenButton"
-openBtn.Size = UDim2.new(0, 60, 0, 60)
-openBtn.Position = UDim2.new(0.8, 0, 0.7, 0)
-openBtn.BackgroundTransparency = 1
-openBtn.Image = "rbxassetid://3570695787"
-openBtn.ImageColor3 = Color3.fromRGB(80, 180, 255)
-openBtn.ImageTransparency = 0.3
+WindUI:Popup({
+    Title = "chou mao V1",
+    IconThemed = true,
+    Content = "欢迎尊贵的用户" .. game.Players.LocalPlayer.Name .. "使用mao 当前版本型号:V1",
+    Buttons = {
+        {
+            Title = "取消",
+            Callback = function() end,
+            Variant = "Secondary",
+        },
+        {
+            Title = "执行",
+            Icon = "arrow-right",
+            Callback = function() 
+                Confirmed = true
+                createUI()
+            end,
+            Variant = "Primary",
+        }
+    }
+})
+function createUI()
+    local Window = WindUI:CreateWindow({
+        Title = "mao",
+        Icon = "palette",
+    Author = "尊贵的"..game.Players.localPlayer.Name.."欢迎使用mao", 
+        Folder = "Premium",
+        Size = UDim2.fromOffset(550, 320),
+        Theme = "Light",
+        User = {
+            Enabled = true,
+            Anonymous = true,
+            Callback = function()
+            end
+        },
+        SideBarWidth = 200,
+        HideSearchBar = false,  
+    })
 
--- 拖动主按钮
-local dragging = false
-local dragInput, mousePos, btnPos
+    Window:Tag({
+        Title = "森林中的99夜",
+        Color = Color3.fromHex("#00ffff") 
+    })
 
-openBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        mousePos = input.Position
-        btnPos = openBtn.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
+    Window:EditOpenButton({
+        Title = "mao V1",
+        Icon = "crown",
+        CornerRadius = UDim.new(0, 8),
+        StrokeThickness = 3,
+        Color = ColorSequence.new(
+            Color3.fromRGB(255, 255, 0),  
+            Color3.fromRGB(255, 165, 0),  
+            Color3.fromRGB(255, 0, 0),    
+            Color3.fromRGB(139, 0, 0)     
+        ),
+        Draggable = true,
+    })
+    
+    local Language = Window:Tab({Title = "Language Settings", Icon = "globe"})
+local Translations = {
+    ["Main"] = "主要",
+    ["Biometrics"] = "生体",
+    ["Infinite Health"] = "无限血",
+    ["Infinite Stamina"] = "无限耐力",
+    ["Adapt to all weapons"] = "适应所有的武器",
+    ["Attack Method"] = "攻击方式",
+    ["Range"] = "范围",
+    ["Full Map"] = "全图",
+    ["Kill Aura"] = "杀戮光环",
+    ["Show Current Weapon"] = "显示当前武器",
+    ["Trees"] = "树木",
+    ["Chop Range [500 Best]"] = "砍树范围[500最佳]",
+    ["Auto Chop Trees"] = "自动砍树",
+    ["Children"] = "小孩",
+    ["Auto Save All Children"] = "自动救所有小孩",
+    ["Auto Equip"] = "自动装备",
+    ["Auto Equip Weapons"] = "自动装备武器",
+    ["Auto Equip Best Weapon"] = "自动装备最佳武器",
+    ["Select Weapon to Equip"] = "选择要装备的武器",
+    ["Auto Equip Selected Weapon"] = "自动装备选定武器",
+    ["Tool Switching"] = "工具切换",
+    ["Random Tool Switching"] = "随机工具切换",
+    ["Planting"] = "种植",
+    ["Planting Shape"] = "种植形状",
+    ["Square"] = "正方形",
+    ["Circle"] = "圆形",
+    ["Original Position"] = "原地",
+    ["Planting Range (meters)"] = "种植范围(米)",
+    ["Planting Height"] = "种植高度",
+    ["Sapling Spacing (meters)"] = "树苗间隔(米)",
+    ["Planting Delay (seconds)"] = "种植延迟(秒)",
+    ["Auto Planting"] = "自动种植",
+    ["Fun Gameplay"] = "趣味玩法",
+    ["Select Pattern"] = "选择图案",
+    ["Sphere"] = "球形",
+    ["Necklace"] = "项链",
+    ["Meteor"] = "流星",
+    ["Rotation Speed"] = "旋转速度",
+    ["Pattern Size"] = "图案大小",
+    ["Auto Form Pattern"] = "自动形成图案",
+    ["Prank Friends"] = "恶搞朋友",
+    ["Select Attack Player"] = "选择攻击玩家",
+    ["None"] = "无",
+    ["Auto Bear Trap Attack"] = "自动捕兽夹攻击",
+    ["Hitbox"] = "打击盒",
+    ["Show Hitbox"] = "显示打击盒",
+    ["Wolf Hitbox"] = "狼打击盒",
+    ["Bunny Hitbox"] = "兔子打击盒",
+    ["Cultist Hitbox"] = "邪教徒打击盒",
+    ["Everything Hitbox"] = "所有东西打击盒",
+    ["Range Size"] = "范围大小",
+    ["Slide to adjust"] = "滑动调整",
+    ["Food"] = "食物",
+    ["Collect Food"] = "收集食物",
+    ["Select food to collect (multiple)"] = "选择要收集的食物（多选）",
+    ["Raw Meat Chunk"] = "生肉块",
+    ["Raw Steak"] = "生牛排",
+    ["Cooked Meat Chunk"] = "熟肉块",
+    ["Cooked Steak"] = "熟牛排",
+    ["Select Position"] = "选择位置",
+    ["Campfire"] = "火堆",
+    ["Auto Throw Selected Food"] = "自动扔选择的食物",
+    ["Remote Cooking"] = "远程烤肉",
+    ["Select meats (multiple)"] = "选择肉类 (多选)",
+    ["Meat Chunk"] = "肉块",
+    ["Steak"] = "牛排",
+    ["Remote Cook Selected Meat"] = "远程烤选择的肉",
+    ["Auto Cook Food"] = "自动烹饪食物",
+    ["Select Cooking Food"] = "选择烹饪食物",
+    ["Ribs"] = "肋骨",
+    ["Salmon"] = "三文鱼",
+    ["Mackerel"] = "鲭鱼",
+    ["Auto Cook Food"] = "自动烹饪食物",
+    ["Eat Food"] = "吃食物",
+    ["Select Food"] = "选择食物",
+    ["Select food to auto eat"] = "选择要自动食用的食物",
+    ["Hunger Threshold"] = "饥饿阈值",
+    ["Auto Feed"] = "自动进食",
+    ["Safety"] = "防鹿",
+    ["Auto Stun Deer"] = "自动眩晕鹿",
+    ["Requires flashlight"] = "需要手电筒",
+    ["Fishing"] = "钓鱼",
+    ["Auto Fishing"] = "自动钓鱼",
+    ["No Delay Fishing"] = "无延迟钓鱼",
+    ["Instant Fishing"] = "秒钓鱼",
+    ["Workbench"] = "工作台",
+    ["Steel"] = "钢材",
+    ["Select steel items to collect (multiple)"] = "选择要收集的钢铁类物品（多选）",
+    ["Bolt"] = "螺栓",
+    ["Broken Fan"] = "破风扇",
+    ["Broken Microwave"] = "坏微波炉",
+    ["Old Radio"] = "旧收音机",
+    ["Washing Machine"] = "洗衣机",
+    ["Old Car Engine"] = "旧汽车引擎",
+    ["Tire"] = "轮胎",
+    ["Sheet Metal"] = "金属板",
+    ["Workbench"] = "工作台",
+    ["Auto Throw Selected Steel"] = "自动扔选择的钢铁",
+    ["Auto Upgrade Workbench"] = "自动升级工作台",
+    ["Auto Craft"] = "自动制作",
+    ["Craft Item Name"] = "制作物品名称",
+    ["Enter item name to craft"] = "输入要制作的物品名称",
+    ["Craft Interval (seconds)"] = "制作间隔(秒)",
+    ["Set crafting interval time"] = "设置每次制作的间隔时间",
+    ["Craft Once"] = "制作一次",
+    ["Auto Craft"] = "自动制作",
+    ["Chest Functions"] = "宝箱功能",
+    ["Auto Open All Chests"] = "自动开全部宝箱",
+    ["Chest Aura"] = "宝箱光环",
+    ["Chest Aura Range"] = "宝箱光环范围",
+    ["Teleport to Nearest Chest"] = "传送到最近宝箱",
+    
+    ["Campfire"] = "火堆",
+    ["Fuel Items"] = "燃料类",
+    ["Select items to collect (multiple)"] = "选择要收集的物品（多选）",
+    ["Wood"] = "木头",
+    ["Coal"] = "煤",
+    ["Fuel Canister"] = "油桶",
+    ["Chair"] = "椅子",
+    ["Biofuel"] = "生物燃料",
+    ["Auto Throw Selected Fuel"] = "自动扔选择的燃料",
+    ["Teleport Back to Campfire"] = "传送回火旁",
+    
+    ["Teleport Functions"] = "传送功能",
+    ["Basic Teleport Points"] = "基础传送点",
+    ["Teleport to Campfire"] = "传送到营火",
+    ["Teleport to Stronghold"] = "传送到要塞",
+    ["Teleport to Safe Zone"] = "传送到安全区",
+    ["Teleport to Merchant"] = "传送到商人",
+    ["Teleport to Random Tree"] = "传送到随机树",
+    ["Chest Teleport"] = "宝箱传送",
+    ["Select Chest"] = "选择宝箱",
+    ["Refresh Chest List"] = "刷新宝箱列表",
+    ["Teleport to Chest"] = "传送到宝箱",
+    ["Child Teleport"] = "儿童传送",
+    ["Select Child"] = "选择儿童",
+    ["Refresh Child List"] = "刷新儿童列表",
+    ["Teleport to Child"] = "传送到儿童",
+    
+  
+    ["Bring"] = "带来",
+    ["Auto Teleport Items"] = "自动传送物品",
+    ["Auto Teleport Wood"] = "自动传送木头",
+    ["Auto Teleport Fuel Canisters"] = "自动传送燃料罐",
+    ["Auto Teleport Oil Barrels"] = "自动传送油桶",
+    ["Auto Teleport All Scrap"] = "自动传送所有废料",
+    ["Auto Teleport Coal"] = "自动传送煤炭",
+    ["Auto Teleport Meat"] = "自动传送肉类",
+    
+    ["Collection"] = "收集",
+    ["Select items to collect (multiple)"] = "选择要收集的物品（多选）",
+    ["Auto Collect Selected Items"] = "自动收集选择的物品",
+    ["Player Functions"] = "玩家功能",
+    ["Speed (On/Off)"] = "速度 (开/关)",
+    ["Speed Settings"] = "速度设置",
+    ["Invisibility"] = "隐身",
+    ["Instant Interaction"] = "秒互动",
+    ["Infinite Jump"] = "无限跳",
+    ["Language Settings"] = "语言设置",
+    ["Current Language"] = "当前语言",
+    ["Chinese"] = "中文",
+    ["English"] = "英文",
+    ["Apply Language"] = "应用语言",
+    ["Restart script to take effect"] = "重启脚本生效"
+}
+local currentLanguage = "English"
+local languageChanged = false
+Language:Dropdown({
+    Title = "Current Language",
+    Values = {"English", "中文"},
+    Value = "English",
+    Callback = function(option)
+        if option == "中文" then
+            currentLanguage = "Chinese"
+        else
+            currentLanguage = "English"
+        end
+        languageChanged = true
+    end
+})
+Language:Button({
+    Title = "Apply Language",
+    Callback = function()
+        if languageChanged then
+            WindUI:Notify({
+                Title = "Language Change",
+                Content = "Please restart the script for changes to take effect",
+                Duration = 5,
+                Icon = "info"
+            })
+            languageChanged = false
+        else
+            WindUI:Notify({
+                Title = "Language",
+                Content = "Language is already set to " .. currentLanguage,
+                Duration = 3,
+                Icon = "info"
+            })
+        end
+    end
+})
+local function translateText(text)
+    if not text or type(text) ~= "string" then return text end
+    
+    if currentLanguage == "Chinese" then
+        return Translations[text] or text
+    else
+        for en, cn in pairs(Translations) do
+            if text == cn then
+                return en
+            end
+        end
+        return text
+    end
+end
+local function translateGUI(gui)
+    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) then
+        pcall(function()
+            local text = gui.Text
+            if text and text ~= "" then
+                local translatedText = translateText(text)
+                if translatedText ~= text then
+                    gui.Text = translatedText
+                end
             end
         end)
     end
-end)
-
-openBtn.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
-        local delta = input.Position - mousePos
-        openBtn.Position = UDim2.new(
-            btnPos.X.Scale, btnPos.X.Offset + delta.X,
-            btnPos.Y.Scale, btnPos.Y.Offset + delta.Y
-        )
+end
+local function scanAndTranslate()
+    for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+        translateGUI(gui)
     end
-end)
-
--- 悬浮窗（初始隐藏）
-local mainFrame = Instance.new("Frame", gui)
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 320, 0, 380)
-mainFrame.Position = UDim2.new(0.5, -160, 0.4, -190)
-mainFrame.BackgroundColor3 = Color3.fromRGB(120, 200, 255)
-mainFrame.BackgroundTransparency = 0.45
-mainFrame.BorderSizePixel = 0
-mainFrame.Visible = false
-
-local UICorner = Instance.new("UICorner", mainFrame)
-UICorner.CornerRadius = UDim.new(0, 20)
-
--- 左侧功能列表
-local listFrame = Instance.new("Frame", mainFrame)
-listFrame.Name = "ListFrame"
-listFrame.Size = UDim2.new(0, 70, 1, 0)
-listFrame.Position = UDim2.new(0, 0, 0, 0)
-listFrame.BackgroundColor3 = Color3.fromRGB(80, 180, 255)
-listFrame.BackgroundTransparency = 0.35
-listFrame.BorderSizePixel = 0
-local listCorner = Instance.new("UICorner", listFrame)
-listCorner.CornerRadius = UDim.new(0, 18)
-
-local UIListLayout = Instance.new("UIListLayout", listFrame)
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 12)
-
--- 右侧主内容显示区域
-local contentFrame = Instance.new("Frame", mainFrame)
-contentFrame.Name = "ContentFrame"
-contentFrame.Position = UDim2.new(0, 76, 0, 16)
-contentFrame.Size = UDim2.new(1, -86, 1, -32)
-contentFrame.BackgroundTransparency = 1
-
--- 主页文本
-local contentLabel = Instance.new("TextLabel", contentFrame)
-contentLabel.Name = "ContentLabel"
-contentLabel.Position = UDim2.new(0, 0, 0, 0)
-contentLabel.Size = UDim2.new(1, 0, 1, 0)
-contentLabel.BackgroundTransparency = 1
-contentLabel.TextColor3 = Color3.fromRGB(40, 40, 100)
-contentLabel.Font = Enum.Font.Gotham
-contentLabel.TextSize = 18
-contentLabel.TextWrapped = true
-contentLabel.TextXAlignment = Enum.TextXAlignment.Left
-contentLabel.TextYAlignment = Enum.TextYAlignment.Top
-contentLabel.Visible = true
-contentLabel.Text = ""
-
--- 功能按钮容器（用于脚本1、脚本2）
-local function clearContentFrame()
-    for _, v in pairs(contentFrame:GetChildren()) do
-        if v ~= contentLabel then
-            v:Destroy()
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+            translateGUI(gui)
         end
     end
-    contentLabel.Visible = false
 end
-
-local function showHome()
-    clearContentFrame()
-    contentLabel.Visible = true
-    contentLabel.Text = [[
-欢迎使用Chmao脚本中心！
-
-QQ群：123456789
-作者：Tzc3916
-介绍：这是一个支持云更新与多功能脚本的移动端脚本中心。
-
-功能：
-1. 点击左侧“脚本1”“脚本2”可体验丰富功能
-2. 点击对应功能名称即可一键执行
-
-如有建议或问题请联系作者。
-]]
+local function setupDescendantListener(parent)
+    parent.DescendantAdded:Connect(function(descendant)
+        if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+            task.wait(0.1)
+            translateGUI(descendant)
+        end
+    end)
 end
-
--- 速度调节功能相关变量和方法（请自行根据你的游戏逻辑完善）
-local speed = 1
-local tpEnabled = false
-function startTPWalk()
-    print("开始TP行走, 速度：" .. tostring(speed))
-    -- 你的TP行走逻辑
+local function setupTranslationEngine()
+    pcall(setupDescendantListener, game:GetService("CoreGui"))
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(setupDescendantListener, player.PlayerGui)
+    end
+    scanAndTranslate()
+    while true do
+        scanAndTranslate()
+        task.wait(3)
+    end
 end
-function stopTPWalk()
-    print("停止TP行走")
-    -- 你的停止逻辑
-end
+task.spawn(function()
+    task.wait(2)
+    setupTranslationEngine()
+end)
+    
+local Main = Window:Tab({Title = "主要", Icon = "user"})
+Main:Section({Title = "生体"})
 
-local function showScriptList(scriptType)
-    clearContentFrame()
-    if scriptType == "Script1" then
-        -- 第1个按钮: 速度调节
-        local funBtn = Instance.new("TextButton", contentFrame)
-        funBtn.Name = scriptType .. "_FuncBtn1"
-        funBtn.Size = UDim2.new(1, 0, 0, 34)
-        funBtn.Position = UDim2.new(0, 0, 0, 0)
-        funBtn.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
-        funBtn.BackgroundTransparency = 0.15
-        funBtn.Text = "速度调节"
-        funBtn.TextColor3 = Color3.fromRGB(40, 40, 100)
-        funBtn.Font = Enum.Font.Gotham
-        funBtn.TextSize = 16
-        funBtn.AutoButtonColor = true
-        funBtn.TextXAlignment = Enum.TextXAlignment.Left
-        local btnCorner = Instance.new("UICorner", funBtn)
-        btnCorner.CornerRadius = UDim.new(0, 10)
-        funBtn.MouseButton1Click:Connect(function()
-            -- 速度调节UI
-            player:Slider('加速设置', 'SpeedSlider', 1, 1, 15, false, function(value)
-                speed = value
-            end)
-            player:Toggle("速度开关", "speed", false, function(value)
-                tpEnabled = value
-                if value then
-                    startTPWalk()
-                else
-                    stopTPWalk()
+Main:Button({
+    Title = "无限血",
+    Callback = function()
+        local args = {
+    [1] = -math.huge  
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.DamagePlayer:FireServer(unpack(args))
+    end
+})
+
+Main:Button({
+    Title = "无限耐力",
+    Callback = function()
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+            hum.WalkSpeed = 20
+        end)
+        hum.WalkSpeed = 20
+    end
+    end
+})
+
+Main:Section({Title = "适应所有的武器"})
+local killAuraEnabled = false
+local attackMethod = "范围" 
+
+Main:Dropdown({
+    Title = "攻击方式",
+    Values = {"范围", "全图"},
+    Value = "范围",
+    Callback = function(option)
+        attackMethod = option
+    end
+})
+
+Main:Toggle({
+    Title = "杀戮光环",
+    Value = false,
+    Callback = function(value)
+        killAuraEnabled = value
+        if value then
+            spawn(function()
+                while killAuraEnabled do
+                    local currentTool = nil
+                    
+              
+                    if game.Players.LocalPlayer.Character then
+                        for _, item in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if item:IsA("Tool") then
+                                currentTool = item
+                                break
+                            end
+                        end
+                        
+                        if not currentTool and game.Players.LocalPlayer.Character:FindFirstChild("ToolHandle") then
+                            local toolHandle = game.Players.LocalPlayer.Character.ToolHandle
+                            if toolHandle:FindFirstChild("OriginalItem") and toolHandle.OriginalItem.Value then
+                                currentTool = toolHandle.OriginalItem.Value
+                            end
+                        end
+                    end
+                    
+                    if not currentTool then
+                        for _, item in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if item:IsA("Tool") then
+                                currentTool = item
+                                break
+                            end
+                        end
+                    end
+                    
+                
+                    if currentTool then
+                        for _, enemy in next, workspace.Characters:GetChildren() do
+                            if enemy:IsA("Model") and enemy:FindFirstChild("HumanoidRootPart") and enemy:FindFirstChild("HitRegisters") then
+                                if enemy ~= game.Players.LocalPlayer.Character then
+                                    local shouldAttack = false
+                                    
+                                    if attackMethod == "范围" then
+                                   
+                                        local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - enemy.HumanoidRootPart.Position).Magnitude
+                                        if distance <= 35 then
+                                            shouldAttack = true
+                                        end
+                                    else
+                                   
+                                        shouldAttack = true
+                                    end
+                                    
+                                    if shouldAttack then
+                                        pcall(function()
+                                            game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ToolDamageObject"):InvokeServer(
+                                                enemy, 
+                                                currentTool, 
+                                                true, 
+                                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                                            )
+                                        end)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    
+                    wait(0)
                 end
             end)
+        end
+    end
+})
+
+local function ShowCurrentWeapon()
+    local currentTool = nil
+    local toolName = "无"
+    
+   
+    if game.Players.LocalPlayer.Character then
+        for _, item in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+            if item:IsA("Tool") then
+                currentTool = item
+                break
+            end
+        end
+        
+       
+        if not currentTool and game.Players.LocalPlayer.Character:FindFirstChild("ToolHandle") then
+            local toolHandle = game.Players.LocalPlayer.Character.ToolHandle
+            if toolHandle:FindFirstChild("OriginalItem") and toolHandle.OriginalItem.Value then
+                currentTool = toolHandle.OriginalItem.Value
+            end
+        end
+    end
+    
+    
+    if not currentTool then
+        for _, item in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+            if item:IsA("Tool") then
+                currentTool = item
+                break
+            end
+        end
+    end
+    
+    
+    if currentTool then
+        toolName = currentTool.Name
+    end
+    
+    WindUI:Notify({
+        Title = "在森林中的99夜",
+        Content = "当前武器: " .. toolName,
+        Duration = 5,
+    })
+    
+    return currentTool
+end
+Main:Button({
+    Title = "显示当前武器",
+    Callback = function()
+        ShowCurrentWeapon()
+    end
+})
+
+Main:Section({Title = "树木"})
+
+local DefaultChopTreeDistance = 500
+local DefaultKillAuraDistance = 20
+if not DistanceForAutoChopTree then
+    DistanceForAutoChopTree = DefaultChopTreeDistance
+end
+if not DistanceForKillAura then
+    DistanceForKillAura = DefaultKillAuraDistance
+end
+
+Main:Input({
+    Title = "砍树范围[500最佳]",
+    Value = tostring(DefaultChopTreeDistance),
+    Callback = function(value)
+        local numValue = tonumber(value)
+        if numValue then
+            DistanceForAutoChopTree = numValue
+        else
+            warn("请输入有效的数字！")
+        end
+    end
+})
+
+Main:Toggle({
+    Title = "自动砍树",
+    Description = "",
+    Default = false,
+    Callback = function(Value)
+        ActiveAutoChopTree = Value
+        task.spawn(function()
+            while ActiveAutoChopTree do
+                local player = game.Players.LocalPlayer
+                local character = player.Character or player.CharacterAdded:Wait()
+                local hrp = character:WaitForChild("HumanoidRootPart")
+                
+               
+                local weapon = nil
+                for _, item in pairs(player.Inventory:GetChildren()) do
+                    if item:IsA("Tool") then
+                        weapon = item
+                        break
+                    end
+                end
+                
+           
+                if not weapon then
+                    weapon = (player.Inventory:FindFirstChild("Old Axe") or player.Inventory:FindFirstChild("Good Axe") or player.Inventory:FindFirstChild("Strong Axe") or player.Inventory:FindFirstChild("Chainsaw"))
+                end
+
+                task.spawn(function()
+                    for _, tree in pairs(workspace.Map.Foliage:GetChildren()) do
+                        if tree:IsA("Model") and (tree.Name == "Small Tree" or tree.Name == "TreeBig1" or tree.Name == "TreeBig2") and tree.PrimaryPart then
+                            local distance = (tree.PrimaryPart.Position - hrp.Position).Magnitude
+                            if distance <= DistanceForAutoChopTree and weapon then
+                                game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(tree, weapon, 999, hrp.CFrame)
+                            end
+                        end
+                    end
+                end)
+                
+                task.spawn(function()
+                    for _, tree in pairs(workspace.Map.Landmarks:GetChildren()) do
+                        if tree:IsA("Model") and (tree.Name == "Small Tree" or tree.Name == "TreeBig1" or tree.Name == "TreeBig2") and tree.PrimaryPart then
+                            local distance = (tree.PrimaryPart.Position - hrp.Position).Magnitude
+                            if distance <= DistanceForAutoChopTree and weapon then
+                                game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(tree, weapon, 999, hrp.CFrame)
+                            end
+                        end
+                    end
+                end)
+                
+                task.wait(0.1)
+            end
         end)
-        -- 其余9个功能按钮占位
-        for i = 2, 10 do
-            local funBtn = Instance.new("TextButton", contentFrame)
-            funBtn.Name = scriptType .. "_FuncBtn" .. i
-            funBtn.Size = UDim2.new(1, 0, 0, 34)
-            funBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 38)
-            funBtn.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
-            funBtn.BackgroundTransparency = 0.15
-            funBtn.Text = "（这里添加功能脚本）"
-            funBtn.TextColor3 = Color3.fromRGB(40, 40, 100)
-            funBtn.Font = Enum.Font.Gotham
-            funBtn.TextSize = 16
-            funBtn.AutoButtonColor = true
-            funBtn.TextXAlignment = Enum.TextXAlignment.Left
-            local btnCorner = Instance.new("UICorner", funBtn)
-            btnCorner.CornerRadius = UDim.new(0, 10)
-            funBtn.MouseButton1Click:Connect(function()
-                print("执行功能脚本：" .. funBtn.Text)
+    end
+})
+Main:Section({Title = "小孩"})
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+
+local originalPositions = {}
+local teleportingEnabled = false
+local teleportationThread = nil
+
+Main:Toggle({
+    Title = "自动救所有小孩",
+    Value = false,
+    Callback = function(value)
+        teleportingEnabled = value
+        
+        if value then
+          
+            for _, kid in pairs(workspace:GetDescendants()) do
+                if kid:IsA("Model") and kid.Name:lower():find("kid") then
+                    originalPositions[kid] = kid:GetPivot()
+                end
+            end
+            
+            
+            teleportationThread = task.spawn(function()
+                while teleportingEnabled and task.wait(1) do
+                    for _, kid in pairs(workspace:GetDescendants()) do
+                        if not teleportingEnabled then break end
+                        
+                        if kid:IsA("Model") and kid.Name:lower():find("kid") then
+                            LocalPlayer.Character:PivotTo(kid:GetPivot())
+                            task.wait(20) 
+                        end
+                    end
+                end
             end)
+        else
+         
+            if teleportationThread then
+                task.cancel(teleportationThread)
+                teleportationThread = nil
+            end
         end
-    else
-        -- 脚本2：10个占位功能按钮
-        for i = 1, 10 do
-            local funBtn = Instance.new("TextButton", contentFrame)
-            funBtn.Name = scriptType .. "_FuncBtn" .. i
-            funBtn.Size = UDim2.new(1, 0, 0, 34)
-            funBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 38)
-            funBtn.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
-            funBtn.BackgroundTransparency = 0.15
-            funBtn.Text = "（这里添加功能脚本）"
-            funBtn.TextColor3 = Color3.fromRGB(40, 40, 100)
-            funBtn.Font = Enum.Font.Gotham
-            funBtn.TextSize = 16
-            funBtn.AutoButtonColor = true
-            funBtn.TextXAlignment = Enum.TextXAlignment.Left
-            local btnCorner = Instance.new("UICorner", funBtn)
-            btnCorner.CornerRadius = UDim.new(0, 10)
-            funBtn.MouseButton1Click:Connect(function()
-                print("执行功能脚本：" .. funBtn.Text)
-            end)
+    end
+})
+
+
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local AutoEquip = Window:Tab({Title = "自动装备", Icon = "user"})
+
+local toolsDamageIDs = {
+    ["Old Axe"] = "3_7367831688",
+    ["Good Axe"] = "112_7367831688",
+    ["Strong Axe"] = "116_7367831688",
+    ["Chainsaw"] = "647_8992824875",
+    ["Infernal Sword"] = "2_4340578793",
+    ["Spear"] = "196_8999010016"
+}
+
+local function getAnyToolWithDamageID(isChopAura)
+    for toolName, damageID in pairs(toolsDamageIDs) do
+        if isChopAura and toolName ~= "Old Axe" and toolName ~= "Good Axe" and toolName ~= "Strong Axe" then
+            continue
         end
+        local tool = LocalPlayer:FindFirstChild("Inventory") and LocalPlayer.Inventory:FindFirstChild(toolName)
+        if tool then
+            return tool, damageID
+        end
+    end
+    return nil, nil
+end
+local function equipTool(tool)
+    if tool then
+        ReplicatedStorage:WaitForChild("RemoteEvents").EquipItemHandle:FireServer("FireAllClients", tool)
     end
 end
 
--- 改造addListButton支持回调
-local function addListButton(name, callback)
-    local btn = Instance.new("TextButton", listFrame)
-    btn.Size = UDim2.new(1, -16, 0, 44)
-    btn.Position = UDim2.new(0, 8, 0, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
-    btn.BackgroundTransparency = 0.2
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(40, 40, 100)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 18
-    btn.AutoButtonColor = true
-    local btnCorner = Instance.new("UICorner", btn)
-    btnCorner.CornerRadius = UDim.new(1, 0)
-    if callback then
-        btn.MouseButton1Click:Connect(callback)
+local function unequipTool(tool)
+    if tool then
+        ReplicatedStorage:WaitForChild("RemoteEvents").UnequipItemHandle:FireServer("FireAllClients", tool)
     end
 end
 
--- 添加功能按钮
-addListButton("主页", showHome)
-addListButton("脚本1", function()
-    showScriptList("Script1")
-end)
-addListButton("脚本2", function()
-    showScriptList("Script2")
-end)
+AutoEquip:Section({ Title = "自动装备武器", Icon = "user" })
 
--- 默认显示主页
-showHome()
+local autoEquipWeapon = false
+local weaponEquipConnection
 
-openBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = not mainFrame.Visible
-end)
+AutoEquip:Toggle({
+    Title = "自动装备最佳武器",
+    Value = false,
+    Callback = function(state)
+        autoEquipWeapon = state
+        if weaponEquipConnection then
+            weaponEquipConnection:Disconnect()
+            weaponEquipConnection = nil
+        end
+        
+        if state then
+            weaponEquipConnection = RunService.Heartbeat:Connect(function()
+                local character = LocalPlayer.Character
+                if not character then return end
+                
+             
+                local bestTool = nil
+                local bestDamage = 0
+                
+                for toolName, damageID in pairs(toolsDamageIDs) do
+                    local tool = LocalPlayer:FindFirstChild("Inventory") and LocalPlayer.Inventory:FindFirstChild(toolName)
+                    if tool then
+                   
+                        local damage = tonumber(damageID:match("^(%d+)_")) or 0
+                        if damage > bestDamage then
+                            bestDamage = damage
+                            bestTool = tool
+                        end
+                    end
+                end
+                
+              
+                if bestTool then
+                    equipTool(bestTool)
+                end
+            end)
+        else
+           
+            local tool, _ = getAnyToolWithDamageID(false)
+            unequipTool(tool)
+        end
+    end
+})
+
+local selectedWeapon = "Strong Axe"
+
+AutoEquip:Dropdown({
+    Title = "选择要装备的武器",
+    Values = {"Old Axe", "Good Axe", "Strong Axe", "Chainsaw", "Infernal Sword", "Spear"},
+    Value = "Strong Axe",
+    Callback = function(option)
+        selectedWeapon = option
+    end
+})
+
+local autoEquipSpecific = false
+local specificEquipConnection
+
+AutoEquip:Toggle({
+    Title = "自动装备选定武器",
+    Value = false,
+    Callback = function(state)
+        autoEquipSpecific = state
+        if specificEquipConnection then
+            specificEquipConnection:Disconnect()
+            specificEquipConnection = nil
+        end
+        
+        if state then
+            specificEquipConnection = RunService.Heartbeat:Connect(function()
+                local character = LocalPlayer.Character
+                if not character then return end
+                
+                local tool = LocalPlayer:FindFirstChild("Inventory") and LocalPlayer.Inventory:FindFirstChild(selectedWeapon)
+                if tool then
+                    equipTool(tool)
+                else
+                    WindUI:Notify({
+                        Title = "武器未找到",
+                        Content = selectedWeapon .. " 不在背包中",
+                        Duration = 3,
+                        Icon = "alert-circle"
+                    })
+                    autoEquipSpecific = false
+                    AutoEquip:Find("自动装备选定武器"):SetValue(false)
+                end
+            end)
+        else
+            local tool = LocalPlayer:FindFirstChild("Inventory") and LocalPlayer.Inventory:FindFirstChild(selectedWeapon)
+            unequipTool(tool)
+        end
+    end
+})
+AutoEquip:Section({ Title = "工具切换", Icon = "refresh-cw" })
+
+local autoToolSwitch = false
+local toolSwitchConnection
+
+AutoEquip:Toggle({
+    Title = "随机工具切换",
+    Value = false,
+    Callback = function(state)
+        autoToolSwitch = state
+        if toolSwitchConnection then
+            toolSwitchConnection:Disconnect()
+            toolSwitchConnection = nil
+        end
+        
+        if state then
+            toolSwitchConnection = RunService.Heartbeat:Connect(function()
+                local character = LocalPlayer.Character
+                if not character then return end
+                
+                local hrp = character:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+                
+              
+                local hasEnemyNearby = false
+                for _, mob in ipairs(Workspace.Characters:GetChildren()) do
+                    if mob:IsA("Model") then
+                        local part = mob:FindFirstChildWhichIsA("BasePart")
+                        if part and (part.Position - hrp.Position).Magnitude <= 50 then
+                            hasEnemyNearby = true
+                            break
+                        end
+                    end
+                end
+                
+             
+                local hasTreeNearby = false
+                local map = Workspace:FindFirstChild("Map")
+                if map then
+                    local trees = {}
+                    if map:FindFirstChild("Foliage") then
+                        for _, obj in ipairs(map.Foliage:GetChildren()) do
+                            if obj:IsA("Model") and (obj.Name == "Small Tree" or obj.Name == "Snowy Small Tree") then
+                                table.insert(trees, obj)
+                            end
+                        end
+                    end
+                    if map:FindFirstChild("Landmarks") then
+                        for _, obj in ipairs(map.Landmarks:GetChildren()) do
+                            if obj:IsA("Model") and obj.Name == "Small Tree" then
+                                table.insert(trees, obj)
+                            end
+                        end
+                    end
+                    
+                    for _, tree in ipairs(trees) do
+                        local trunk = tree:FindFirstChild("Trunk")
+                        if trunk and trunk:IsA("BasePart") and (trunk.Position - hrp.Position).Magnitude <= 50 then
+                            hasTreeNearby = true
+                            break
+                        end
+                    end
+                end
+                
+            
+                if hasEnemyNearby then
+                   
+                    local combatTools = {"Infernal Sword", "Spear", "Chainsaw", "Strong Axe", "Good Axe"}
+                    for _, toolName in ipairs(combatTools) do
+                        local tool = LocalPlayer:FindFirstChild("Inventory") and LocalPlayer.Inventory:FindFirstChild(toolName)
+                        if tool then
+                            equipTool(tool)
+                            break
+                        end
+                    end
+                elseif hasTreeNearby then
+                
+                    local loggingTools = {"Chainsaw", "Strong Axe", "Good Axe", "Old Axe"}
+                    for _, toolName in ipairs(loggingTools) do
+                        local tool = LocalPlayer:FindFirstChild("Inventory") and LocalPlayer.Inventory:FindFirstChild(toolName)
+                        if tool then
+                            equipTool(tool)
+                            break
+                        end
+                    end
+                else
+                  
+                    local bestTool = nil
+                    local bestDamage = 0
+                    
+                    for toolName, damageID in pairs(toolsDamageIDs) do
+                        local tool = LocalPlayer:FindFirstChild("Inventory") and LocalPlayer.Inventory:FindFirstChild(toolName)
+                        if tool then
+                            local damage = tonumber(damageID:match("^(%d+)_")) or 0
+                            if damage > bestDamage then
+                                bestDamage = damage
+                                bestTool = tool
+                            end
+                        end
+                    end
+                    
+                    if bestTool then
+                        equipTool(bestTool)
+                    end
+                end
+            end)
+        else
+          
+            local tool, _ = getAnyToolWithDamageID(false)
+            unequipTool(tool)
+        end
+    end
+})
+
+local Main = Window:Tab({Title = "种植", Icon = "user"})
+
+local plantingConfig = {
+    shape = "square",  
+    size = 80,        
+    height = 3,     
+    spacing = 1,       
+    delay = 1          
+}
+
+local shapeOptions = {
+    ["正方形"] = "square",
+    ["圆形"] = "circle",
+    ["原地"] = "original"
+}
+local function generatePlantPositions()
+    local positions = {}
+    local halfSize = plantingConfig.size / 2
+    
